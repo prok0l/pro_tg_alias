@@ -10,6 +10,7 @@ from tg_bot.handlers.help import register_help
 from tg_bot.handlers.new_game import register_new_game
 from tg_bot.handlers.start import register_start
 from tg_bot.handlers.error import register_error
+from tg_bot.services.db_api import DBApi
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +25,10 @@ def register_all_filters(dp):
     pass
 
 
-def register_all_handlers(dp):
-    register_start(dp)
+def register_all_handlers(dp, db):
+    register_start(dp, db)
     register_help(dp)
-    register_new_game(dp)
+    register_new_game(dp, db)
     register_error(dp)
 
 
@@ -40,10 +41,10 @@ async def main():
     storage = RedisStorage2() if config.use_redis else MemoryStorage()
     dp = Dispatcher(bot, storage=storage)
     bot['config'] = config
-
+    db = DBApi("systemd/1.db")
     register_all_middlewares(dp)
     register_all_filters(dp)
-    register_all_handlers(dp)
+    register_all_handlers(dp, db)
 
     try:
         await dp.start_polling()

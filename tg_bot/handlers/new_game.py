@@ -3,6 +3,8 @@ import time
 from asyncio import sleep
 from aiogram import types, Dispatcher
 
+from tg_bot.services.db_api import DBApi
+
 user_data = {}
 
 
@@ -30,11 +32,11 @@ async def bot_new_game(message: types.Message):
     if user_data.get(id_user, {"is_now_game": False})["is_now_game"]:
         await message.delete()
         return None
-    with open(r"C:\Users\prokol\Documents\alias-men.txt",
+    duration, path = db_obj.user_info(id_user)
+    with open(f"systemd/decks/{path}",
               encoding="utf-8") as f:
         list_words = [x.strip() for x in f.readlines()]
     random.shuffle(list_words)
-    duration = 60
     user_data[id_user] = {"now_list": [],
                           "deck": list_words,
                           "true_count": 0,
@@ -101,7 +103,9 @@ async def send_reaction(call: types.CallbackQuery):
                                      reply_markup=data["kbd"])
 
 
-def register_new_game(dp: Dispatcher):
+def register_new_game(dp: Dispatcher, db: DBApi):
+    global db_obj
+    db_obj = db
     dp.register_message_handler(callback=bot_new_game, commands=['new_game'],
                                 content_types="text", state=None)
     dp.register_message_handler(callback=bot_stop_game, commands=['stop_game'],
