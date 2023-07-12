@@ -6,9 +6,10 @@ from aiogram import types, Dispatcher
 from tg_bot.services.db_api import DBApi
 
 user_data = {}
+db_obj = None
 
 
-def word(count: int):
+def word(count: int) -> str:
     """
     Функция для склонения слова "слово"
     :param count:
