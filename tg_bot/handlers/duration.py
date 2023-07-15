@@ -22,6 +22,7 @@ async def duration_chosen(message: types.Message, state: FSMContext):
         db_obj.change_duration(tg_id=message.from_user.id,
                                new_duration=int(message.text))
         await state.finish()
+        await message.answer("Время изменено")
     else:
         await message.answer("Напишите длительность раунда в секундах"
                              " (не больше 600): ")

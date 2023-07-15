@@ -197,6 +197,14 @@ class DBApi:
             return False
         return True
 
+    def check_deck_id(self, deck_id):
+        if self.connect(text_for_execute=
+                        "SELECT * FROM decks WHERE id=?",
+                        params=(deck_id, ),
+                        fetchall=True):
+            return True
+        return False
+
 
 if __name__ == '__main__':
     obj = DBApi("../../systemd/2.db")

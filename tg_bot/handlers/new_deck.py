@@ -16,7 +16,7 @@ class OrderDeck(StatesGroup):
     waiting_for_file = State()
 
 
-async def duration_start(message: types.Message, state: FSMContext):
+async def new_deck_start(message: types.Message, state: FSMContext):
     if db_obj.is_max_decks(tg_id=message.from_user.id):
         await message.answer("У вас максимальное количество колод")
         return
@@ -58,7 +58,7 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
 def register_new_deck(dp: Dispatcher, db: DBApi):
     global db_obj
     db_obj = db
-    dp.register_message_handler(callback=duration_start, commands=["new_deck"],
+    dp.register_message_handler(callback=new_deck_start, commands=["new_deck"],
                                 state="*")
     dp.register_message_handler(callback=cmd_cancel, commands=["cancel"],
                                 state=[OrderDeck.waiting_for_file,
