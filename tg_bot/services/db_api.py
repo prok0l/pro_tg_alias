@@ -1,6 +1,8 @@
 import sqlite3
 import os
 
+from tg_bot.services.consts import DeckTypes, DeckTypesList
+
 
 class DBApi:
     def __init__(self, path):
@@ -66,26 +68,25 @@ class DBApi:
                     );
 
                          """)
-            types = [("Public", "true"),
-                     ("Private", "false"),
-                     ("On moderation", "false")]
-            for par in types:
+            for par in DeckTypesList.Types.value:
                 self.connect(text_for_execute=
                              """INSERT INTO deck_type(name, is_public)
                             VALUES(?, ?)""",
                              params=par)
             pub_type_id = self.connect(text_for_execute=
-                                    "SELECT id FROM deck_type WHERE name=?",
-                                    params=("Public", ), fetchall=True)[0][0]
-            decks = [("Alias дамы против джентельменов (муж. версия)",
-                      pub_type_id, "1.txt"),
+                                       "SELECT id FROM deck_type WHERE name=?",
+                                       params=(DeckTypes.Public.value, ),
+                                       fetchall=True)[0][0]
+            decks = [("Alias party", pub_type_id, "1.txt"),
+                     ("Alias дамы против джентельменов (муж. версия)",
+                      pub_type_id, "2.txt"),
                      ("Alias дамы против джентельменов (жен. версия)",
-                      pub_type_id, "2.txt")]
+                      pub_type_id, "3.txt")]
             for deck in decks:
                 self.connect(text_for_execute="""
                             INSERT INTO decks(name, type, path)
                             VALUES(?, ?, ?)""",
-                            params=deck)
+                                              params=deck)
 
     def create_user(self, tg_id, username):
         if self.connect(text_for_execute="""
@@ -95,18 +96,21 @@ class DBApi:
         self.connect(text_for_execute="""
         INSERT INTO users(tg_id, username) VALUES(?, ?)""",
                      params=(tg_id, username, ))
-        decks = self.connect("""SELECT id FROM decks ORDER BY id LIMIT 1""", fetchall=True)[0][0]
-        now_deck = self.connect(text_for_execute="""
+        decks = self.connect("""SELECT id FROM decks ORDER BY id LIMIT 1""",
+                             fetchall=True)[0][0]
+        now_deck = self.connect(text_for_execute=
+                                """
         INSERT INTO decks_users(id_user, id_deck) VALUES(?, ?) RETURNING id""",
-                     params=(tg_id, decks), fetchall=True)[0][0]
+                                params=(tg_id, decks), fetchall=True)[0][0]
         self.connect(text_for_execute="""
         INSERT INTO settings_user(id_user, now_deck)
          VALUES(?, ?)""", params=(tg_id, now_deck))
 
     def user_info(self, tg_id):
-        dur, now_deck_link = self.connect(text_for_execute="""
+        dur, now_deck_link = self.connect(text_for_execute=
+                                          """
         SELECT duration, now_deck FROM settings_user WHERE id_user=?""",
-                                    params=(tg_id, ), fetchall=True)[0]
+                                          params=(tg_id, ), fetchall=True)[0]
         now_deck_id = self.connect(text_for_execute="""
         SELECT id_deck FROM decks_users WHERE id=?""",
                                    params=(now_deck_link, ),
@@ -131,19 +135,68 @@ class DBApi:
 
     def decks_by_tg_id(self, tg_id):
         decks_id = self.connect("""SELECT id, id_deck FROM decks_users
-         WHERE id_user=?""",
-        params=(tg_id, ), fetchall=True)
+         WHERE id_user=?""", params=(tg_id, ), fetchall=True)
         decks = []
         for deck_id in decks_id:
             deck_name = self.connect("""SELECT name FROM decks WHERE id=?""",
-                         params=(deck_id[1], ), fetchall=True)[0][0]
+                                     params=(deck_id[1], ),
+                                     fetchall=True)[0][0]
             decks.append((deck_id[0], deck_name))
         return decks
 
+    def is_max_decks(self, tg_id):
+        limit = self.connect(text_for_execute=
+                             "SELECT `limit` FROM users WHERE tg_id=?;",
+                             params=(tg_id, ), fetchall=True)
+        if not limit:
+            return True
+        else:
+            limit = limit[0][0]
+        if limit == -1:
+            return False
+        count = self.connect("SELECT COUNT (*) FROM decks WHERE owner=?;",
+                             params=(tg_id, ), fetchall=True)[0][0]
+        if count >= limit:
+            return True
+        return False
+
+    def new_deck(self, tg_id, name, path):
+        if self.is_max_decks(tg_id=tg_id):
+            return None
+        pub_type_id = self.connect(text_for_execute=
+                                   "SELECT id FROM deck_type WHERE name=?",
+                                   params=(DeckTypes.Private.value,),
+                                   fetchall=True)[0][0]
+        deck_id = self.connect(text_for_execute=
+                               "INSERT INTO decks(name, type, owner, path)"
+                               "VALUES(?, ?, ?, ?) RETURNING id;",
+                               params=(name, pub_type_id, tg_id, path, ),
+                               fetchall=True)[0][0]
+        self.add_deck(tg_id=tg_id, deck_id=deck_id)
+        return deck_id
+
+    def add_deck(self, tg_id, deck_id):
+        if self.connect(text_for_execute=
+                        "SELECT * FROM decks_users WHERE id_user=? AND "
+                        "id_deck=?", params=(tg_id, deck_id, ),
+                        fetchall=True):
+            return None
+
+        link_id = self.connect(text_for_execute=
+                               "INSERT INTO decks_users(id_user, id_deck)"
+                               "VALUES(?, ?) RETURNING id;",
+                               params=(tg_id, deck_id, ), fetchall=True)[0][0]
+        self.change_deck(tg_id=tg_id, deck_link=link_id)
+        return link_id
+
+    def check_deck_name(self, deck_name):
+        if self.connect(text_for_execute=
+                     "SELECT * FROM decks WHERE name=?",
+                     params=(deck_name, ),
+                     fetchall=True):
+            return False
+        return True
 
 
 if __name__ == '__main__':
-    obj = DBApi("../../systemd/1.db")
-    obj.change_deck(700843021, 3)
-    print(obj.user_info(700843021))
-    print(obj.decks_by_tg_id(700843021))
+    obj = DBApi("../../systemd/2.db")
