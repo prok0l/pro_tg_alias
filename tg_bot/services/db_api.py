@@ -28,7 +28,7 @@ class DBApi:
             self.connect(text_for_execute="""
                          CREATE TABLE IF NOT EXISTS `users` (
                             `tg_id` INTEGER PRIMARY KEY,
-                            `username` TEXT NOT NULL,
+                            `username` TEXT,
                             `limit` INTEGER NOT NULL DEFAULT 1
                         );""")
             self.connect(text_for_execute="""
@@ -62,7 +62,7 @@ class DBApi:
                          CREATE TABLE IF NOT EXISTS `settings_user` (
                         `id_user` INTEGER NOT NULL UNIQUE,
                         `duration` INTEGER NOT NULL DEFAULT '60',
-                        `now_deck` INTEGER NOT NULL,
+                        `now_deck` INTEGER,
                         FOREIGN KEY (`id_user`) REFERENCES `users` (`tg_id`),
                         FOREIGN KEY (`now_deck`) REFERENCES `decks_users`(`id`)
                     );
@@ -107,16 +107,18 @@ class DBApi:
          VALUES(?, ?)""", params=(tg_id, now_deck))
 
     def user_info(self, tg_id):
-        dur, now_deck_link = self.connect(text_for_execute=
+        dur, now_deck_path = self.connect(text_for_execute=
                                           """
         SELECT duration, now_deck FROM settings_user WHERE id_user=?""",
                                           params=(tg_id, ), fetchall=True)[0]
-        now_deck_id = self.connect(text_for_execute="""
-        SELECT id_deck FROM decks_users WHERE id=?""",
-                                   params=(now_deck_link, ),
-                                   fetchall=True)[0]
-        now_deck_path = self.connect("""SELECT path FROM decks WHERE id=?""",
-                                     params=now_deck_id, fetchall=True)[0][0]
+        if now_deck_path:
+            now_deck_id = self.connect(text_for_execute="""
+            SELECT id_deck FROM decks_users WHERE id=?""",
+                                       params=(now_deck_path, ),
+                                       fetchall=True)[0]
+            now_deck_path = self.connect("""SELECT path FROM decks
+             WHERE id=?""", params=now_deck_id, fetchall=True)[0][0]
+
         return dur, now_deck_path
 
     def change_duration(self, tg_id, new_duration):
@@ -125,10 +127,10 @@ class DBApi:
                      params=(new_duration, tg_id, ))
 
     def change_deck(self, tg_id, deck_link):
-        if not self.connect("""SELECT * FROM decks_users WHERE id=?
-         AND id_user=?""",
-                            params=(deck_link, tg_id), fetchall=True):
-            return None
+        # if not self.connect("""SELECT * FROM decks_users WHERE id=?
+        #  AND id_user=?""",
+        #                     params=(deck_link, tg_id), fetchall=True):
+        #     return None
         self.connect(text_for_execute="""
                 UPDATE settings_user SET now_deck=? WHERE id_user=?""",
                      params=(deck_link, tg_id,))
@@ -205,6 +207,18 @@ class DBApi:
             return True
         return False
 
+    def deck_info(self, tg_id, deck_id):
+        if self.connect(text_for_execute=
+                        "SELECT * FROM decks_users WHERE id_user=? AND "
+                        "id_deck=?", params=(tg_id, deck_id,),
+                        fetchall=True):
+            return None
+        name = self.connect(text_for_execute="SELECT name FROM decks WHERE "
+                                             "id=?",
+                            params=(deck_id, ), fetchall=True)[0][0]
+        return name
+
 
 if __name__ == '__main__':
-    obj = DBApi("../../systemd/2.db")
+    obj = DBApi("../../systemd/1.db")
+    # print(obj.deck_info(tg_id=1128355560, deck_id=1))

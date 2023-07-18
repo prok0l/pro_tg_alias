@@ -17,4 +17,27 @@
 - - [ ] написание list_decks (изменить, удалить)
 - - [x] написание add_deck
 - - [ ] написание my_decks
+- - - [x] написать выбрать
+- - - [ ] написать удалить
 - - [ ] написание my_account
+- - [ ] написать магазин колод
+
+
+- [ ] перенос текста в константы
+- - [x] add_deck
+- - [x] my_decks
+- - [x] new_deck
+- - [ ] new_game
+- - [x] duration
+- - [x] help
+- - [x] start
+
+
+- [ ] создание документации/комментариев
+- - [ ] DB
+- - [ ] DBApi
+- - [x] add_deck
+- - [x] my_decks
+- - [x] duration
+- - [ ] new_game
+- - [ ] new_deck

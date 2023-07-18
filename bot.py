@@ -7,6 +7,7 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
 from tg_bot.config import load_config
 from tg_bot.handlers.help import register_help
+from tg_bot.handlers.my_decks import register_my_decks
 from tg_bot.handlers.new_deck import register_new_deck
 from tg_bot.handlers.new_game import register_new_game
 from tg_bot.handlers.start import register_start
@@ -35,6 +36,7 @@ def register_all_handlers(dp, db):
     register_duration(dp, db)
     register_new_deck(dp=dp, db=db)
     register_add_deck(dp=dp, db=db)
+    register_my_decks(dp=dp, db=db)
     register_error(dp)
 
 

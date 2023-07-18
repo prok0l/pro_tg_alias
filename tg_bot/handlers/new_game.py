@@ -7,7 +7,7 @@ from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import Path
 
 user_data = {}
-db_obj = None
+db_obj: DBApi = None
 
 
 def word(count: int) -> str:
@@ -35,6 +35,10 @@ async def bot_new_game(message: types.Message):
         await message.delete()
         return None
     duration, path = db_obj.user_info(id_user)
+    if not path:
+        await message.answer("Простите, но у вас нету выбранной"
+                             " колоды для игры")
+        return None
     with open(Path.decks.value + path,
               encoding="utf-8") as f:
         list_words = [x.strip() for x in f.readlines()]
