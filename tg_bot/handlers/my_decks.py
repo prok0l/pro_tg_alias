@@ -15,6 +15,10 @@ class OrderDeck(StatesGroup):
 
 async def my_decks_start(message: types.Message, state: FSMContext):
     decks, now_deck = db_obj.decks_by_tg_id(tg_id=message.from_user.id)
+    # проверка на наличие колод
+    if not decks:
+        await message.answer(MyDecksText.NO_DECKS.value)
+        return None
     # формирование строки с перечнем колод и нумерацией
     decks_str_lst = []
     for ind in range(len(decks)):
@@ -72,7 +76,6 @@ async def btn(message: types.Message, state: FSMContext):
         await message.answer(MyDecksText.DEL_DECK.value,
                              reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
-
 
 
 async def cmd_cancel(message: types.Message, state: FSMContext):

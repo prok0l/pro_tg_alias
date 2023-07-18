@@ -48,6 +48,7 @@ class MyDecksText(str, Enum):
     INVALID_BTN = "Выберите действие кнопками ниже"
     CHOOSE_DECK = "Вы выбрали колоду - {name}"
     DEL_DECK = "Колода успешно удалена"
+    NO_DECKS = "У вас нету колод"
 
 
 class NewDeckText(str, Enum):
