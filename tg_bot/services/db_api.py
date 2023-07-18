@@ -136,6 +136,10 @@ class DBApi:
                      params=(deck_link, tg_id,))
 
     def decks_by_tg_id(self, tg_id):
+        now_deck = self.connect(text_for_execute="""
+        SELECT now_deck FROM settings_user WHERE id_user=?""",
+                                     params=(tg_id,), fetchall=True)[0][0]
+
         decks_id = self.connect("""SELECT id, id_deck FROM decks_users
          WHERE id_user=?""", params=(tg_id, ), fetchall=True)
         decks = []
@@ -144,7 +148,7 @@ class DBApi:
                                      params=(deck_id[1], ),
                                      fetchall=True)[0][0]
             decks.append((deck_id[0], deck_name))
-        return decks
+        return decks, now_deck
 
     def is_max_decks(self, tg_id):
         limit = self.connect(text_for_execute=
@@ -218,7 +222,32 @@ class DBApi:
                             params=(deck_id, ), fetchall=True)[0][0]
         return name
 
+    def del_deck_link(self, tg_id, deck_link):
+        if self.connect("SELECT * FROM settings_user WHERE id_user=? AND "
+                        "now_deck=?",
+                        params=(tg_id, deck_link, ), fetchall=True):
+            self.connect(text_for_execute="""
+            UPDATE settings_user SET now_deck=? WHERE id_user=?""",
+                         params=(None, tg_id,))
+        self.connect("DELETE FROM decks_users WHERE id=?",
+                     params=(deck_link, ))
+
+    def decks_shop(self, tg_id):
+        pub_id = self.connect("SELECT id FROM deck_type "
+                              "WHERE is_public", fetchall=True)[0][0]
+        decks = self.connect("SELECT id, name FROM decks "
+                             "WHERE type=?",
+                             params=(pub_id, ), fetchall=True)
+        for i in range(len(decks)):
+            id, _ = decks[i]
+            decks[i] += (bool(self.connect("SELECT * FROM decks_users "
+                                           "WHERE id_user=? AND id_deck=?",
+                                           params=(tg_id, id),
+                                           fetchall=True)), )
+        return decks
+
 
 if __name__ == '__main__':
     obj = DBApi("../../systemd/1.db")
+    obj.decks_shop(700843021)
     # print(obj.deck_info(tg_id=1128355560, deck_id=1))

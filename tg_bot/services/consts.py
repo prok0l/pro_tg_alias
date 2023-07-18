@@ -47,6 +47,7 @@ class MyDecksText(str, Enum):
     CHOOSE_BTN = "Теперь выберите действие"
     INVALID_BTN = "Выберите действие кнопками ниже"
     CHOOSE_DECK = "Вы выбрали колоду - {name}"
+    DEL_DECK = "Колода успешно удалена"
 
 
 class NewDeckText(str, Enum):
@@ -85,5 +86,12 @@ class Help(str, Enum):
     DURATION = "/duration - длительность раунда\n"
     MY_DECKS = "/my_decks - список колод\n"
     NEW_DECK = "/new_deck - создать свою колоду\n"
-    CANCEL = "/cancel - отменить операцию"
+    CANCEL = "/cancel - отменить операцию\n"
+    DECKS_SHOP = "/decks_shop - магазин колод\n"
 
+
+class DecksShopText(str, Enum):
+    START = "Напишите номер колоды из списка: "
+    INVALID_NUM = "Пожалуйста, напишите номер из списка"
+    ADD_DECK = "Колода успешно добавлена"
+    ADDED_EARLIER = "Эта колода уже была добавлена ранее"

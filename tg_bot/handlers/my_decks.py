@@ -14,10 +14,15 @@ class OrderDeck(StatesGroup):
 
 
 async def my_decks_start(message: types.Message, state: FSMContext):
-    decks = db_obj.decks_by_tg_id(tg_id=message.from_user.id)
+    decks, now_deck = db_obj.decks_by_tg_id(tg_id=message.from_user.id)
     # формирование строки с перечнем колод и нумерацией
-    decks_str = "\n".join(f"{ind + 1}) {decks[ind][1]}"
-                          for ind in range(len(decks)))
+    decks_str_lst = []
+    for ind in range(len(decks)):
+        if decks[ind][0] != now_deck:
+            decks_str_lst.append(f"{ind + 1}) {decks[ind][1]}")
+        else:
+            decks_str_lst.append(f"{ind + 1}) <b>{decks[ind][1]}</b>")
+    decks_str = "\n".join(decks_str_lst)
     await message.answer(
         decks_str + "\n" + MyDecksText.START.value
         )
@@ -60,6 +65,14 @@ async def btn(message: types.Message, state: FSMContext):
                              .format(name=data['decks_str'][ind]),
                              reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
+    # обработка удаления колоды
+    else:
+        db_obj.del_deck_link(tg_id=message.from_user.id,
+                             deck_link=data["decks_ids"][ind])
+        await message.answer(MyDecksText.DEL_DECK.value,
+                             reply_markup=types.ReplyKeyboardRemove())
+        await state.finish()
+
 
 
 async def cmd_cancel(message: types.Message, state: FSMContext):
