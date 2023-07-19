@@ -7,3 +7,4 @@ from . import new_deck
 from . import add_deck
 from . import my_decks
 from . import decks_shop
+from . import list_decks

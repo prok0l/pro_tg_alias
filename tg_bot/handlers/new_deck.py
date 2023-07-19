@@ -36,24 +36,26 @@ async def name_chosen(message: types.Message, state: FSMContext):
 async def file_chosen(message: types.Message, state: FSMContext):
     file_id = message.document.file_id
     file = await message.bot.get_file(file_id)
-    path = str(max(int(x.split(".")[0]) for x in os.listdir(Path.decks.value +
+    path = str(max(int(x.split(".")[0]) for x in os.listdir(Path.DECKS.value +
                                                             '.')) + 1) + ".txt"
     await message.bot.download_file(file_path=file.file_path,
-                                    destination=Path.decks.value + path)
-    file_filter(Path.decks.value + path)
+                                    destination=Path.DECKS.value + path)
+    file_filter(Path.DECKS.value + path)
     data = await state.get_data()
     deck_id = db_obj.new_deck(tg_id=message.from_user.id,
                               name=data["name"], path=path)
     await message.answer(NewDeckText.ADDED.value
                          .format(name=data['name'],
-                                 type=DeckTypes.Private.value,
+                                 type=DeckTypes.PRIVATE.value,
                                  deck_id=deck_id))
     await state.finish()
 
 
 async def cmd_cancel(message: types.Message, state: FSMContext):
+    kbd = types.ReplyKeyboardRemove()
     await state.finish()
-    await message.answer(CancelText.CANCEL.value)
+    await message.answer(CancelText.CANCEL.value,
+                         reply_markup=kbd)
 
 
 def register_new_deck(dp: Dispatcher, db: DBApi):

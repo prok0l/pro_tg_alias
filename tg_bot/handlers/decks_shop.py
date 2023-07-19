@@ -31,7 +31,7 @@ async def decks_shop_start(message: types.Message, state: FSMContext):
 async def deck_chosen(message: types.Message, state: FSMContext):
     data = await state.get_data()
     # проверка на корректность ind
-    if message.text.isdigit() and (ind := int(message.text)) <= \
+    if message.text.isdigit() and 0 < (ind := int(message.text)) <= \
             len(data["decks_ids"]):
         # запись выбранной колоды
         link = db_obj.add_deck(tg_id=message.from_user.id,
@@ -47,8 +47,10 @@ async def deck_chosen(message: types.Message, state: FSMContext):
 
 
 async def cmd_cancel(message: types.Message, state: FSMContext):
+    kbd = types.ReplyKeyboardRemove()
     await state.finish()
-    await message.answer(CancelText.CANCEL.value)
+    await message.answer(CancelText.CANCEL.value,
+                         reply_markup=kbd)
 
 
 def register_decks_shop(dp: Dispatcher, db: DBApi):
@@ -61,4 +63,3 @@ def register_decks_shop(dp: Dispatcher, db: DBApi):
                                 state=DecksShopSM.waiting_for_deck)
     dp.register_message_handler(callback=deck_chosen,
                                 state=DecksShopSM.waiting_for_deck)
-

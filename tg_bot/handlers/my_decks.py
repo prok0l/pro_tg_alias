@@ -38,7 +38,7 @@ async def my_decks_start(message: types.Message, state: FSMContext):
 async def deck_chosen(message: types.Message, state: FSMContext):
     data = await state.get_data()
     # проверка на корректность ind
-    if message.text.isdigit() and (ind := int(message.text)) <= \
+    if message.text.isdigit() and 0 < (ind := int(message.text)) <= \
             len(data["decks_ids"]):
         # запись выбранной колоды
         await state.update_data(deck_ind=ind - 1)
@@ -79,8 +79,10 @@ async def btn(message: types.Message, state: FSMContext):
 
 
 async def cmd_cancel(message: types.Message, state: FSMContext):
+    kbd = types.ReplyKeyboardRemove()
     await state.finish()
-    await message.answer(CancelText.CANCEL.value)
+    await message.answer(CancelText.CANCEL.value,
+                         reply_markup=kbd)
 
 
 def register_my_decks(dp: Dispatcher, db: DBApi):

@@ -39,7 +39,7 @@ async def bot_new_game(message: types.Message):
         await message.answer("Простите, но у вас нету выбранной"
                              " колоды для игры")
         return None
-    with open(Path.decks.value + path,
+    with open(Path.DECKS.value + path,
               encoding="utf-8") as f:
         list_words = [x.strip() for x in f.readlines()]
     random.shuffle(list_words)

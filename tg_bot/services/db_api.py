@@ -20,6 +20,10 @@ class DBApi:
                 conn.commit()
 
     def global_init(self):
+        """
+        функция глобальной инициализации (создание всех таблиц и т.д.)
+        :return:
+        """
         print(
             "Connecting to the database at " + '"' + self.path + '"')
         if not os.path.exists(self.path):
@@ -75,7 +79,7 @@ class DBApi:
                              params=par)
             pub_type_id = self.connect(text_for_execute=
                                        "SELECT id FROM deck_type WHERE name=?",
-                                       params=(DeckTypes.Public.value, ),
+                                       params=(DeckTypes.PUBLIC.value,),
                                        fetchall=True)[0][0]
             decks = [("Alias party", pub_type_id, "1.txt"),
                      ("Alias дамы против джентельменов (муж. версия)",
@@ -89,6 +93,12 @@ class DBApi:
                                               params=deck)
 
     def create_user(self, tg_id, username):
+        """
+        функция создания юзера (триггер handler start.py)
+        :param tg_id:
+        :param username:
+        :return:
+        """
         if self.connect(text_for_execute="""
         SELECT * FROM users WHERE tg_id=?;
         """, params=(tg_id, ), fetchall=True):
@@ -107,6 +117,11 @@ class DBApi:
          VALUES(?, ?)""", params=(tg_id, now_deck))
 
     def user_info(self, tg_id):
+        """
+        функция возврата времени раунда и текущей колоды
+        :param tg_id:
+        :return:
+        """
         dur, now_deck_path = self.connect(text_for_execute=
                                           """
         SELECT duration, now_deck FROM settings_user WHERE id_user=?""",
@@ -122,11 +137,23 @@ class DBApi:
         return dur, now_deck_path
 
     def change_duration(self, tg_id, new_duration):
+        """
+        смена длительности раунда
+        :param tg_id:
+        :param new_duration:
+        :return:
+        """
         self.connect(text_for_execute="""
         UPDATE settings_user SET duration=? WHERE id_user=?""",
                      params=(new_duration, tg_id, ))
 
     def change_deck(self, tg_id, deck_link):
+        """
+        функция смены текущей выбранной колоды
+        :param tg_id:
+        :param deck_link: ссылка на id таблицы decks_users
+        :return:
+        """
         # if not self.connect("""SELECT * FROM decks_users WHERE id=?
         #  AND id_user=?""",
         #                     params=(deck_link, tg_id), fetchall=True):
@@ -151,6 +178,11 @@ class DBApi:
         return decks, now_deck
 
     def is_max_decks(self, tg_id):
+        """
+        функция проверки лимита количества созданных колод
+        :param tg_id:
+        :return:
+        """
         limit = self.connect(text_for_execute=
                              "SELECT `limit` FROM users WHERE tg_id=?;",
                              params=(tg_id, ), fetchall=True)
@@ -167,11 +199,18 @@ class DBApi:
         return False
 
     def new_deck(self, tg_id, name, path):
+        """
+        функция создания новой колоды
+        :param tg_id:
+        :param name:
+        :param path:
+        :return:
+        """
         if self.is_max_decks(tg_id=tg_id):
             return None
         pub_type_id = self.connect(text_for_execute=
                                    "SELECT id FROM deck_type WHERE name=?",
-                                   params=(DeckTypes.Private.value,),
+                                   params=(DeckTypes.PRIVATE.value,),
                                    fetchall=True)[0][0]
         deck_id = self.connect(text_for_execute=
                                "INSERT INTO decks(name, type, owner, path)"
@@ -182,6 +221,13 @@ class DBApi:
         return deck_id
 
     def add_deck(self, tg_id, deck_id):
+        """
+        функция добавления колоды к списку колод пользователя (линковка)
+        также выставляет новодобавленную колоду в текущую
+        :param tg_id:
+        :param deck_id:
+        :return:
+        """
         if self.connect(text_for_execute=
                         "SELECT * FROM decks_users WHERE id_user=? AND "
                         "id_deck=?", params=(tg_id, deck_id, ),
@@ -196,14 +242,24 @@ class DBApi:
         return link_id
 
     def check_deck_name(self, deck_name):
+        """
+        функция проверки уникальности названия колоды
+        :param deck_name:
+        :return:
+        """
         if self.connect(text_for_execute=
-                     "SELECT * FROM decks WHERE name=?",
-                     params=(deck_name, ),
-                     fetchall=True):
+                        "SELECT * FROM decks WHERE name=?",
+                        params=(deck_name, ),
+                        fetchall=True):
             return False
         return True
 
     def check_deck_id(self, deck_id):
+        """
+        функция проверки существования колоды по его id
+        :param deck_id:
+        :return:
+        """
         if self.connect(text_for_execute=
                         "SELECT * FROM decks WHERE id=?",
                         params=(deck_id, ),
@@ -212,6 +268,14 @@ class DBApi:
         return False
 
     def deck_info(self, tg_id, deck_id):
+        """
+        функция проверки колоды перед линковкой
+        возвращает None, если колода уже была добавлена
+        возвращает название колоды
+        :param tg_id:
+        :param deck_id:
+        :return:
+        """
         if self.connect(text_for_execute=
                         "SELECT * FROM decks_users WHERE id_user=? AND "
                         "id_deck=?", params=(tg_id, deck_id,),
@@ -223,6 +287,12 @@ class DBApi:
         return name
 
     def del_deck_link(self, tg_id, deck_link):
+        """
+        удаляет линковку колоды с юзером
+        :param tg_id:
+        :param deck_link:
+        :return:
+        """
         if self.connect("SELECT * FROM settings_user WHERE id_user=? AND "
                         "now_deck=?",
                         params=(tg_id, deck_link, ), fetchall=True):
@@ -233,6 +303,12 @@ class DBApi:
                      params=(deck_link, ))
 
     def decks_shop(self, tg_id):
+        """
+        функция получения одобренных колод (Public)
+        также возвращает True если колода уже есть у пользователя
+        :param tg_id:
+        :return:
+        """
         pub_id = self.connect("SELECT id FROM deck_type "
                               "WHERE is_public", fetchall=True)[0][0]
         decks = self.connect("SELECT id, name FROM decks "
@@ -246,8 +322,80 @@ class DBApi:
                                            fetchall=True)), )
         return decks
 
+    def refactor_deck(self, deck_id):
+        """
+        функция смены статуса колоды на ожидание (On Moderation),
+        если до этого она была (Public), триггер rename_deck,
+        change_file_in_deck
+        :param deck_id:
+        :return:
+        """
+        pub_id = self.connect("SELECT id FROM deck_type WHERE is_public",
+                              fetchall=True)[0][0]
+        if self.connect("SELECT type FROM decks WHERE id=?",
+                        params=(deck_id, ), fetchall=True)[0][0] == pub_id:
+            mod_id = self.connect("SELECT id FROM deck_type WHERE name=?",
+                                  params=(DeckTypes.MODERATION.value,),
+                                  fetchall=True)[0][0]
+            self.connect("UPDATE decks SET type=? WHERE id=?",
+                         params=(mod_id, deck_id))
+
+    def rename_deck(self, deck_id, new_name):
+        """
+        функция переименования колоды
+        :param deck_id:
+        :param new_name:
+        :return:
+        """
+        if not self.check_deck_name(deck_name=new_name):
+            return False
+        self.refactor_deck(deck_id=deck_id)
+        self.connect("UPDATE decks SET name=? WHERE id=?",
+                     params=(new_name, deck_id, ))
+        return True
+
+    def change_file_in_deck(self, deck_id, new_path):
+        """
+        функция смены загрузочного файла колоды
+        :param deck_id:
+        :param new_path:
+        :return:
+        """
+        self.refactor_deck(deck_id=deck_id)
+        self.connect("UPDATE decks SET path=? WHERE id=?",
+                     params=(new_path, deck_id,))
+
+    def change_type_deck(self, deck_id, new_type):
+        """
+        функция смены статуса колоды
+        :param deck_id:
+        :param new_type:
+        :return:
+        """
+        type_id = self.connect("SELECT id FROM deck_type WHERE name=?",
+                               params=(new_type, ),
+                               fetchall=True)[0][0]
+        self.connect("UPDATE decks SET type=? WHERE id=?",
+                     params=(type_id, deck_id))
+
+    def decks_by_owner(self, tg_id):
+        """
+        функция возврата колод, созданных (tg_id)
+        :param tg_id:
+        :return:
+        """
+        decks_lst = self.connect("SELECT id, name, type FROM"
+                                 " decks WHERE owner=?",
+                                 params=(tg_id, ),
+                                 fetchall=True)
+        decks = []
+        for deck in decks_lst:
+            type = self.connect("SELECT name FROM deck_type WHERE id=?",
+                                params=(deck[2], ), fetchall=True)[0][0]
+            decks.append([deck[0], deck[1], type])
+        return decks
+
 
 if __name__ == '__main__':
     obj = DBApi("../../systemd/1.db")
-    obj.decks_shop(700843021)
-    # print(obj.deck_info(tg_id=1128355560, deck_id=1))
+    print(obj.decks_by_owner(700843021))

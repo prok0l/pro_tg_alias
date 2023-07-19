@@ -30,8 +30,10 @@ async def duration_chosen(message: types.Message, state: FSMContext):
 
 
 async def cmd_cancel(message: types.Message, state: FSMContext):
+    kbd = types.ReplyKeyboardRemove()
     await state.finish()
-    await message.answer(CancelText.CANCEL.value)
+    await message.answer(CancelText.CANCEL.value,
+                         reply_markup=kbd)
 
 
 def register_duration(dp: Dispatcher, db: DBApi):

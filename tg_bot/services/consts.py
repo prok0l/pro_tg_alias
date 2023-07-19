@@ -2,19 +2,19 @@ from enum import Enum
 
 
 class Path(str, Enum):
-    decks = "systemd/decks/"
+    DECKS = "systemd/decks/"
 
 
 class DeckTypes(str, Enum):
-    Public = "Public"
-    Private = "Private"
-    Moderation = "On moderation"
+    PUBLIC = "Public"
+    PRIVATE = "Private"
+    MODERATION = "On moderation"
 
 
 class DeckTypesList(list, Enum):
-    Types = [(DeckTypes.Public, True),
-             (DeckTypes.Private, False),
-             (DeckTypes.Moderation, False)]
+    Types = [(DeckTypes.PUBLIC, True),
+             (DeckTypes.PRIVATE, False),
+             (DeckTypes.MODERATION, False)]
 
 
 class CancelText(str, Enum):
@@ -92,7 +92,46 @@ class Help(str, Enum):
 
 
 class DecksShopText(str, Enum):
-    START = "Напишите номер колоды из списка: "
-    INVALID_NUM = "Пожалуйста, напишите номер из списка"
-    ADD_DECK = "Колода успешно добавлена"
-    ADDED_EARLIER = "Эта колода уже была добавлена ранее"
+    START = MyDecksText.START.value
+    INVALID_NUM = MyDecksText.INVALID_NUM.value
+    ADD_DECK = AddDeckText.ADDED.value
+    ADDED_EARLIER = AddDeckText.ADDED_EARLIER.value
+
+
+class ListDecksTypes(dict, Enum):
+    TYPES = {
+        DeckTypes.PUBLIC.value: "🔓",
+        DeckTypes.PRIVATE.value: "🔒",
+        DeckTypes.MODERATION.value: "⌛️"
+    }
+
+
+class ListDecksText(str, Enum):
+    LIST = "{ind}) {name}\t{type_str}"
+    YOUR_DECKS = "Колоды созданные вами:\n"
+    INVALID_NUM = MyDecksText.INVALID_NUM.value
+    START = MyDecksText.START.value
+    CHOOSE_BTN = MyDecksText.CHOOSE_BTN.value
+    INVALID_BTN = MyDecksText.INVALID_BTN.value
+    ACTION_EDIT = "Теперь выберите действие"
+    TYPE_EDIT = "Колода отправлена на проверку"
+    NEW_NAME = "Введите новое название для колоды: "
+    NEW_FILE = "Отправьте новый файл для колоды с расширением txt"
+    NO_DECKS = "Вы ещё не создали, ни одной колоды"
+    BUZY = NewDeckText.BUZY.value
+    RENAME = "Имя успешно изменено"
+
+
+class ListDecksButtons:
+    class Actions(str, Enum):
+        EDIT = "Изменить"
+        DEL = "Удалить"
+
+    class Delete(str, Enum):
+        YES = "Да"
+        NO = "Нет"
+
+    class Edit(str, Enum):
+        NAME = "Название"
+        FILE = "Файл"
+        TYPE = "Статус"
