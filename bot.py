@@ -15,6 +15,7 @@ from tg_bot.handlers.duration import register_duration
 from tg_bot.handlers.add_deck import register_add_deck
 from tg_bot.handlers.decks_shop import register_decks_shop
 from tg_bot.handlers.list_decks import register_list_decks
+from tg_bot.handlers.my_account import register_my_account
 from tg_bot.handlers.error import register_error
 from tg_bot.services.db_api import DBApi
 
@@ -41,6 +42,7 @@ def register_all_handlers(dp, db):
     register_my_decks(dp=dp, db=db)
     register_decks_shop(dp=dp, db=db)
     register_list_decks(dp=dp, db=db)
+    register_my_account(dp=dp, db=db)
     register_error(dp)
 
 

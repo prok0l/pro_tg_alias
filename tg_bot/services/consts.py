@@ -87,8 +87,10 @@ class Help(str, Enum):
     DURATION = "/duration - длительность раунда\n"
     MY_DECKS = "/my_decks - список колод\n"
     NEW_DECK = "/new_deck - создать свою колоду\n"
-    CANCEL = "/cancel - отменить операцию\n"
     DECKS_SHOP = "/decks_shop - магазин колод\n"
+    LIST_DECKS = "/list_decks - колоды созданные мной\n"
+    MY_ACCOUNT = "/my_account - информация об аккаунте\n"
+    CANCEL = "/cancel - отменить операцию\n"
 
 
 class DecksShopText(str, Enum):
@@ -120,12 +122,17 @@ class ListDecksText(str, Enum):
     NO_DECKS = "Вы ещё не создали, ни одной колоды"
     BUZY = NewDeckText.BUZY.value
     RENAME = "Имя успешно изменено"
-
+    TYPE_PRIVATE = "Отправить на модерацию"
+    TYPE_MODERATION = "Сделать приватной"
+    TYPE_PUBLIC = "Сделать приватной"
+    TYPE_EDIT_PRIVATE = "Колода сделана приватной"
+    DELETE = "Колода успешно удалена"
 
 class ListDecksButtons:
     class Actions(str, Enum):
         EDIT = "Изменить"
         DEL = "Удалить"
+        TYPE = "Статус"
 
     class Delete(str, Enum):
         YES = "Да"
@@ -134,4 +141,21 @@ class ListDecksButtons:
     class Edit(str, Enum):
         NAME = "Название"
         FILE = "Файл"
-        TYPE = "Статус"
+
+    class Type(str, Enum):
+        YES = "Да"
+        NO = "Нет"
+
+
+class LimitText(str, Enum):
+    UNLIMIT = "♾️"
+
+
+class MyAccountText(str, Enum):
+    LINK_DECKS1 = "{name}"
+    LINK_DECKS2 = "<b>{name}</b>"
+    OWNERS_DECKS = "{name}\t{type_str}"
+    DURATION = "Длительность раунда:"
+    LINK_DECKS_STR = "Мои колоды:\n"
+    OWNERS_DECKS_STR = "Колоды созданные мной\n"
+    LIMIT = "Лимит:"

@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-from tg_bot.services.consts import DeckTypes, DeckTypesList
+from tg_bot.services.consts import DeckTypes, DeckTypesList, LimitText
 
 
 class DBApi:
@@ -163,6 +163,11 @@ class DBApi:
                      params=(deck_link, tg_id,))
 
     def decks_by_tg_id(self, tg_id):
+        """
+        функция для получения линкованных колод с юзером
+        :param tg_id:
+        :return:
+        """
         now_deck = self.connect(text_for_execute="""
         SELECT now_deck FROM settings_user WHERE id_user=?""",
                                      params=(tg_id,), fetchall=True)[0][0]
@@ -395,7 +400,35 @@ class DBApi:
             decks.append([deck[0], deck[1], type])
         return decks
 
+    def del_deck(self, deck_id):
+        users = self.connect(text_for_execute="""
+        SELECT id_user, id FROM decks_users WHERE id_deck=?""",
+                             params=(deck_id, ), fetchall=True)
+        for user in users:
+            self.del_deck_link(tg_id=user[0],
+                               deck_link=user[1])
+        self.connect(text_for_execute="""
+        DELETE FROM decks WHERE id=?""",
+                     params=(deck_id, ))
+
+    def my_account(self, tg_id):
+        dur, _ = self.user_info(tg_id=tg_id)
+        deck_links = self.decks_by_tg_id(tg_id=tg_id)
+        deck_owner = self.decks_by_owner(tg_id=tg_id)
+        limit = self.connect(text_for_execute=
+                             "SELECT `limit` FROM users WHERE tg_id=?;",
+                             params=(tg_id,), fetchall=True)
+        if not limit:
+            limit = 0
+        else:
+            limit = limit[0][0]
+        if limit == -1:
+            limit = LimitText.UNLIMIT.value
+        count = self.connect("SELECT COUNT (*) FROM decks WHERE owner=?;",
+                             params=(tg_id,), fetchall=True)[0][0]
+        return dur, deck_links, deck_owner, limit, count
+
 
 if __name__ == '__main__':
     obj = DBApi("../../systemd/1.db")
-    print(obj.decks_by_owner(700843021))
+    obj.my_account(tg_id=700843021)

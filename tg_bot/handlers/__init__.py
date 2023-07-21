@@ -8,3 +8,4 @@ from . import add_deck
 from . import my_decks
 from . import decks_shop
 from . import list_decks
+from . import my_account

@@ -6,6 +6,8 @@ from aiogram.dispatcher.filters import Command
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import Start
 
+db_obj: DBApi = None
+
 
 async def bot_start(message: types.Message):
     await message.answer(Start.START.value)
