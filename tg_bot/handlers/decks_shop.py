@@ -18,12 +18,17 @@ async def decks_shop_start(message: types.Message, state: FSMContext):
     decks_str_lst = []
     for ind in range(len(decks)):
         if not decks[ind][-1]:
-            decks_str_lst.append(f"{ind + 1}) {decks[ind][1]}")
+            decks_str_lst.append(DecksShopText.DECK_NAME.value.format(
+                ind=ind+1,
+                name=decks[ind][1]))
         else:
-            decks_str_lst.append(f"{ind + 1}) <s>{decks[ind][1]}</s>")
+            decks_str_lst.append(DecksShopText.DECK_NAME_AVAILABLE.value.format(
+                ind=ind+1, name=decks[ind][1]))
+
     await message.answer(
         "\n".join(decks_str_lst) + "\n" + DecksShopText.START.value
         )
+
     await state.update_data(decks_ids=[x[0] for x in decks])  # ids
     await state.set_state(DecksShopSM.waiting_for_deck.state)
 

@@ -49,6 +49,8 @@ class MyDecksText(str, Enum):
     CHOOSE_DECK = "Вы выбрали колоду - {name}"
     DEL_DECK = "Колода успешно удалена"
     NO_DECKS = "У вас нету колод"
+    DECK_NAME = "{ind}) {name}"
+    DECK_NAME_USED = "{ind}) <b>{name}</b>"
 
 
 class NewDeckText(str, Enum):
@@ -56,9 +58,9 @@ class NewDeckText(str, Enum):
     NAME = "Напишите название новой колоды:  "
     BUZY = "Извините, это название уже занято"
     TXT = "Теперь пришлите файл с расширением txt"
-    ADDED = "Добавлена колода - {name}\n"\
-            "Статус {type} "\
-            "можно изменить в меню колод.\n"\
+    ADDED = "Добавлена колода - {name}\n" \
+            "Статус {type} " \
+            "можно изменить в меню колод.\n" \
             "id колоды - <code>{deck_id}</code>"
 
 
@@ -98,6 +100,8 @@ class DecksShopText(str, Enum):
     INVALID_NUM = MyDecksText.INVALID_NUM.value
     ADD_DECK = AddDeckText.ADDED.value
     ADDED_EARLIER = AddDeckText.ADDED_EARLIER.value
+    DECK_NAME = "{ind}) {name}"
+    DECK_NAME_AVAILABLE = "{ind}) <s>{name}</s>"
 
 
 class ListDecksTypes(dict, Enum):
@@ -128,6 +132,7 @@ class ListDecksText(str, Enum):
     TYPE_EDIT_PRIVATE = "Колода сделана приватной"
     DELETE = "Колода успешно удалена"
 
+
 class ListDecksButtons:
     class Actions(str, Enum):
         EDIT = "Изменить"
@@ -155,7 +160,30 @@ class MyAccountText(str, Enum):
     LINK_DECKS1 = "{name}"
     LINK_DECKS2 = "<b>{name}</b>"
     OWNERS_DECKS = "{name}\t{type_str}"
-    DURATION = "Длительность раунда:"
-    LINK_DECKS_STR = "Мои колоды:\n"
-    OWNERS_DECKS_STR = "Колоды созданные мной\n"
-    LIMIT = "Лимит:"
+    STR = "Длительность раунда: {dur}\n" + \
+          "Мои колоды:\n" + \
+          "{link_decks_str}\n" + \
+          "Колоды созданные мной:\n" + \
+          "{owner_decks_str}\n" + \
+          "Лимит: {count}/{limit}"
+
+
+class NewGameText(str, Enum):
+    WORD1 = "слово"
+    WORD2 = "слов"
+    WORD3 = "слова"
+    START = "Время: {time} ⏱\n" \
+            "Слова:\n" \
+            "{words}"
+    NO_AVAILABLE_DECK = "Простите, но у вас нету выбранной колоды для игры"
+    END = "Время вышло ⏱\n" \
+          "{words}\n" \
+          "Вы угадали {true_count} {true_word}\n" \
+          "Вы пропустили {skip_count} {skip_word}"
+    TRUE_WORD = "{word} ✅"
+    SKIP_WORD = "<s>{word}</s>"
+
+
+class NewGameButtons(str, Enum):
+    TRUE = "Угадали"
+    SKIP = "Пропустить"

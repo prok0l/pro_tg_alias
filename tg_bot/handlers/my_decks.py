@@ -23,9 +23,13 @@ async def my_decks_start(message: types.Message, state: FSMContext):
     decks_str_lst = []
     for ind in range(len(decks)):
         if decks[ind][0] != now_deck:
-            decks_str_lst.append(f"{ind + 1}) {decks[ind][1]}")
+            decks_str_lst.append(MyDecksText.DECK_NAME.value.format(
+                ind=ind+1, name=decks[ind][1]
+            ))
         else:
-            decks_str_lst.append(f"{ind + 1}) <b>{decks[ind][1]}</b>")
+            decks_str_lst.append(MyDecksText.DECK_NAME_USED.value.format(
+                ind=ind + 1, name=decks[ind][1]
+            ))
     decks_str = "\n".join(decks_str_lst)
     await message.answer(
         decks_str + "\n" + MyDecksText.START.value

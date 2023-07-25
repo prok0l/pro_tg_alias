@@ -25,12 +25,13 @@ async def my_account(message: types.Message):
                                                     type_str=type_str))
     link_decks_str = "\n".join(link_decks_lst)
     owner_decks_str = "\n".join(owner_decks_lst)
-    await message.answer(f"{MyAccountText.DURATION.value} {dur}\n"
-                         f"{MyAccountText.LINK_DECKS_STR.value}"
-                         f"{link_decks_str}\n"
-                         f"{MyAccountText.OWNERS_DECKS_STR.value}"
-                         f"{owner_decks_str}\n"
-                         f"{MyAccountText.LIMIT.value} {count}/{limit}")
+    await message.answer(MyAccountText.STR.format(
+        dur=dur,
+        link_decks_str=link_decks_str,
+        owner_decks_str=owner_decks_str,
+        count=count,
+        limit=limit
+    ))
 
 
 def register_my_account(dp: Dispatcher, db: DBApi):

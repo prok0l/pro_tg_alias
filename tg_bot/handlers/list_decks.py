@@ -74,13 +74,12 @@ async def action_btn(message: types.Message, state: FSMContext):
         data = await state.get_data()
         deck = data["decks"][data["ind"]]
         msg = ""
-        match deck[2]:
-            case DeckTypes.PRIVATE.value:
-                msg = ListDecksText.TYPE_PRIVATE.value
-            case DeckTypes.MODERATION.value:
-                msg = ListDecksText.TYPE_MODERATION.value
-            case DeckTypes.PUBLIC.value:
-                msg = ListDecksText.TYPE_PUBLIC.value
+        if deck[2] == DeckTypes.PRIVATE.value:
+            msg = ListDecksText.TYPE_PRIVATE.value
+        elif deck[2] == DeckTypes.MODERATION.value:
+            msg = ListDecksText.TYPE_MODERATION.value
+        elif deck[2] == DeckTypes.PUBLIC.value:
+            msg = ListDecksText.TYPE_PUBLIC.value
         kbd.add(*ListDecksButtons.Type)
         await message.answer(msg, reply_markup=kbd)
         await state.set_state(ListDecksSM.waiting_for_type.state)
