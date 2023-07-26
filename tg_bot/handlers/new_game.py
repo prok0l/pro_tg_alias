@@ -9,7 +9,7 @@ from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import Path, NewGameText, NewGameButtons
 
 user_data = {}
-db_obj: DBApi = None
+db_obj: DBApi
 
 
 class GameSM(StatesGroup):

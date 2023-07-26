@@ -3,7 +3,7 @@ from aiogram import types, Dispatcher
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import MyAccountText, ListDecksTypes
 
-db_obj: DBApi = None
+db_obj: DBApi
 
 
 async def my_account(message: types.Message):

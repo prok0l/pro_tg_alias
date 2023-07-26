@@ -5,7 +5,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import CancelText, DurationText
 
-db_obj: DBApi = None
+db_obj: DBApi
 
 
 class OrderDuration(StatesGroup):

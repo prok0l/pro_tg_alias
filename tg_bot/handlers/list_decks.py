@@ -9,7 +9,7 @@ from tg_bot.services.consts import CancelText, ListDecksTypes, ListDecksText,\
     ListDecksButtons, DeckTypes, Path
 from tg_bot.services.file_filter import file_filter
 
-db_obj: DBApi = None
+db_obj: DBApi
 
 
 class ListDecksSM(StatesGroup):

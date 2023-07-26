@@ -187,3 +187,27 @@ class NewGameText(str, Enum):
 class NewGameButtons(str, Enum):
     TRUE = "Угадали"
     SKIP = "Пропустить"
+
+
+class ChangeLimitText(str, Enum):
+    NO_USER = "Извините, но такого юзера не обнаружено"
+    WAIT_LIMIT = "Теперь введите лимит для данного пользователя"
+    ALPH = "-0123456789"
+    NEW_LIMIT = "Лимит успешно изменен"
+    INCORRECT = "Пожалуйста напишите лимит цифрами"
+
+
+class ModerationText(str, Enum):
+    NO_DECKS = "Нет колод на модерации"
+    START = "{ind}) {x[1]}\t({x[2]})"
+    START_FULL = "{str}\n" + MyDecksText.START.value
+    INVALID_NUM = MyDecksText.INVALID_NUM.value
+    INFO = "name: {x[1]}\n" \
+           "owner: {x[2]}"
+    INVALID_BTN = MyDecksText.INVALID_BTN.value
+    END = "Тип колоды изменен на: {type}"
+
+
+class ModerationButtons(str, Enum):
+    APPROVE = "Одобрить"
+    BAN = "Запретить"

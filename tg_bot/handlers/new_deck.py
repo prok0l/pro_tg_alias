@@ -8,7 +8,7 @@ from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import Path, DeckTypes, NewDeckText, CancelText
 from tg_bot.services.file_filter import file_filter
 
-db_obj: DBApi = None
+db_obj: DBApi
 
 
 class OrderDeck(StatesGroup):

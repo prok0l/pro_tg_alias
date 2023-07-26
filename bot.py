@@ -16,6 +16,9 @@ from tg_bot.handlers.add_deck import register_add_deck
 from tg_bot.handlers.decks_shop import register_decks_shop
 from tg_bot.handlers.list_decks import register_list_decks
 from tg_bot.handlers.my_account import register_my_account
+from tg_bot.handlers.change_limit import register_change_limit
+from tg_bot.handlers.users import register_users
+from tg_bot.handlers.moderation import register_moderation
 from tg_bot.handlers.error import register_error
 from tg_bot.services.db_api import DBApi
 
@@ -32,7 +35,7 @@ def register_all_filters(dp):
     pass
 
 
-def register_all_handlers(dp, db):
+def register_all_handlers(dp: Dispatcher, db: DBApi, admins: list):
     register_start(dp=dp, db=db)
     register_help(dp=dp)
     register_new_game(dp=dp, db=db)
@@ -43,12 +46,16 @@ def register_all_handlers(dp, db):
     register_decks_shop(dp=dp, db=db)
     register_list_decks(dp=dp, db=db)
     register_my_account(dp=dp, db=db)
+    register_users(dp=dp, db=db, admins=admins)
+    register_change_limit(dp=dp, db=db, admins=admins)
+    register_moderation(dp=dp, db=db, admins=admins)
     register_error(dp)
 
 
 async def main():
     logging.basicConfig(level=logging.INFO,
-                        format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s')
+                        format=u'%(filename)s:%(lineno)d #%(levelname)-8s'
+                               u' [%(asctime)s] - %(name)s - %(message)s')
 
     config = load_config(".env")
     bot = Bot(token=config.token, parse_mode="HTML")
@@ -58,7 +65,7 @@ async def main():
     db = DBApi("systemd/1.db")
     register_all_middlewares(dp)
     register_all_filters(dp)
-    register_all_handlers(dp, db)
+    register_all_handlers(dp=dp, db=db, admins=config.admin_ids)
 
     try:
         await dp.start_polling()

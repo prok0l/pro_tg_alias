@@ -29,4 +29,4 @@ async def error_handler(update, exception):
 
 
 def register_error(dp: Dispatcher):
-    dp.register_message_handler(callback=error_handler)
+    dp.register_errors_handler(callback=error_handler)

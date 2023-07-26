@@ -5,7 +5,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import CancelText, DecksShopText
 
-db_obj: DBApi = None
+db_obj: DBApi
 
 
 class DecksShopSM(StatesGroup):
@@ -22,8 +22,8 @@ async def decks_shop_start(message: types.Message, state: FSMContext):
                 ind=ind+1,
                 name=decks[ind][1]))
         else:
-            decks_str_lst.append(DecksShopText.DECK_NAME_AVAILABLE.value.format(
-                ind=ind+1, name=decks[ind][1]))
+            decks_str_lst.append(DecksShopText.DECK_NAME_AVAILABLE.value.
+                                 format(ind=ind+1, name=decks[ind][1]))
 
     await message.answer(
         "\n".join(decks_str_lst) + "\n" + DecksShopText.START.value

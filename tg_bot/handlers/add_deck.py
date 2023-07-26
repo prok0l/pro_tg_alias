@@ -8,7 +8,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import AddDeckButtons, AddDeckText, CancelText
 
-db_obj: DBApi = None
+db_obj: DBApi
 
 
 class AddDeckSM(StatesGroup):

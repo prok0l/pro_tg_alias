@@ -401,6 +401,11 @@ class DBApi:
         return decks
 
     def del_deck(self, deck_id):
+        """
+        удалить колоду (триггер list_decks)
+        :param deck_id:
+        :return:
+        """
         users = self.connect(text_for_execute="""
         SELECT id_user, id FROM decks_users WHERE id_deck=?""",
                              params=(deck_id, ), fetchall=True)
@@ -412,6 +417,11 @@ class DBApi:
                      params=(deck_id, ))
 
     def my_account(self, tg_id):
+        """
+        функция для обработки хэндлера my_account
+        :param tg_id:
+        :return:
+        """
         dur, _ = self.user_info(tg_id=tg_id)
         deck_links = self.decks_by_tg_id(tg_id=tg_id)
         deck_owner = self.decks_by_owner(tg_id=tg_id)
@@ -428,7 +438,47 @@ class DBApi:
                              params=(tg_id,), fetchall=True)[0][0]
         return dur, deck_links, deck_owner, limit, count
 
+    def users(self):
+        """
+        функция для обработки хендлера users (выдача всех юзеров)
+        :return:
+        """
+        return self.connect("SELECT * FROM users;", fetchall=True)
+
+    def check_user_in_db(self, tg_id):
+        """
+        функция проверки, есть ли юзер в бд
+        :param tg_id:
+        :return:
+        """
+        return self.connect("SELECT * FROM users WHERE tg_id=?",
+                            params=(tg_id, ), fetchall=True)
+
+    def change_limit(self, tg_id, new_limit):
+        """
+        функция смены лимита у юзера
+        :param tg_id:
+        :param new_limit:
+        :return:
+        """
+        self.connect("UPDATE users SET `limit`=? WHERE tg_id=?",
+                     params=(new_limit, tg_id))
+
+    def moderation(self):
+        mod_id = self.connect("SELECT id FROM deck_type WHERE name=?",
+                              params=(DeckTypes.MODERATION.value, ),
+                              fetchall=True)[0][0]
+        decks = self.connect("SELECT id, name, owner, path FROM decks "
+                             "WHERE type=?",
+                             params=(mod_id, ), fetchall=True)
+        decks_with_username = []
+        for (deck_id, name, tg_id, path) in decks:
+            username = self.connect("SELECT username FROM users WHERE tg_id=?",
+                                    params=(tg_id, ), fetchall=True)[0][0]
+            decks_with_username.append([deck_id, name, username, path])
+        return decks_with_username
+
 
 if __name__ == '__main__':
     obj = DBApi("../../systemd/1.db")
-    obj.my_account(tg_id=700843021)
+    print(obj.moderation())
