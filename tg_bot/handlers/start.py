@@ -9,8 +9,12 @@ db_obj: DBApi
 async def bot_start(message: types.Message):
     await message.answer(Start.START.value)
     id_user = message.from_user.id
-    username = message.from_user.username if message.from_user.username \
-        else message.from_user.first_name + message.from_user.last_name
+    if message.from_user.username:
+        username = message.from_user.username
+    else:
+        username = message.from_user.first_name
+        if message.from_user.last_name:
+            username += " " + message.from_user.last_name
     db_obj.create_user(tg_id=id_user, username=username)
 
 
