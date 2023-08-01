@@ -37,7 +37,7 @@ def register_all_filters(dp):
 
 def register_all_handlers(dp: Dispatcher, db: DBApi, admins: list):
     register_start(dp=dp, db=db)
-    register_help(dp=dp)
+    register_help(dp=dp, admins=admins)
     register_new_game(dp=dp, db=db)
     register_duration(dp=dp, db=db)
     register_new_deck(dp=dp, db=db)

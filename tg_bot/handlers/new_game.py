@@ -106,6 +106,7 @@ async def bot_new_game(message: types.Message, state: FSMContext):
         skip_count=data["skip_count"],
         skip_word=word_func(data["skip_count"])
     ))
+    user_data.pop(id_user)
 
 
 async def bot_stop_game(message: types.Message):
@@ -160,6 +161,6 @@ def register_new_game(dp: Dispatcher, db: DBApi):
     dp.register_message_handler(callback=bot_new_game, commands=['new_game'],
                                 content_types="text", state=None)
     dp.register_message_handler(callback=bot_stop_game, commands=['stop_game'],
-                                content_types="text", state=None)
+                                content_types="text", state=GameSM.now_game)
     dp.register_callback_query_handler(callback=send_reaction,
                                        state=GameSM.now_game)

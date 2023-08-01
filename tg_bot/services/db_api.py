@@ -465,6 +465,10 @@ class DBApi:
                      params=(new_limit, tg_id))
 
     def moderation(self):
+        """
+        функция для модерации колод
+        :return:
+        """
         mod_id = self.connect("SELECT id FROM deck_type WHERE name=?",
                               params=(DeckTypes.MODERATION.value, ),
                               fetchall=True)[0][0]
@@ -482,3 +486,6 @@ class DBApi:
 if __name__ == '__main__':
     obj = DBApi("../../systemd/1.db")
     print(obj.moderation())
+
+
+

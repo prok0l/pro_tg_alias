@@ -95,6 +95,12 @@ class Help(str, Enum):
     CANCEL = "/cancel - отменить операцию\n"
 
 
+class AdminHelp(str, Enum):
+    USERS = "/users - список юзеров\n"
+    CHANGE_LIMIT = "/change_limit `tg_id` - смена лимита\n"
+    MODERATION = "/moderation - модерация колод\n"
+
+
 class DecksShopText(str, Enum):
     START = MyDecksText.START.value
     INVALID_NUM = MyDecksText.INVALID_NUM.value

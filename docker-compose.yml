@@ -1,0 +1,19 @@
+version: "3.1"
+
+services:
+  tg_alias:
+    container_name: tg_alias_bot
+    build:
+      context: .
+    command: python bot.py
+    restart: always
+    networks:
+      - botnet
+    env_file:
+      - ".env"
+    volumes:
+      - .:/Alias_bot
+
+networks:
+  botnet:
+    driver: bridge

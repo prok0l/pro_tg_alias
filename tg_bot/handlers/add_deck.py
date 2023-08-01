@@ -1,8 +1,5 @@
-import logging
-
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from tg_bot.services.db_api import DBApi

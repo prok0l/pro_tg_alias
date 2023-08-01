@@ -1,62 +1,22 @@
-## Telegram bot для игры в Alias, с возможностью создания собственной колоды
+# Telegram bot для игры в Alias, с возможностью создания собственной колоды
 
-------
+### https://t.me/alias_tgbot
 
-# TODO
+Список команд:
+/start - старт бота  
+/help - список команд  
+/new_game - запустить игру  
+/stop_game - остановить игру  
+/add_deck - добавить колоду через id  
+/duration - длительность раунда  
+/my_decks - список колод  
+/new_deck - создать свою колоду  
+/decks_shop - магазин колод  
+/list_decks - колоды созданные мной  
+/my_account - информация об аккаунте  
+/cancel - отменить операцию
 
-- [x] Создание репозитория
-- [x] установки необходимых биюлиотек
-- [x] создание requirements.txt
-- [x] разработка архитектуры бд
-- [x] написание api для бд
-- [x] инициализация бота
-- [x] написание интерфейса игры
-- [x] написание интерфейса настроек
-- - [x] написание duration
-- - [x] написание new_deck
-- - [x] написание list_decks (изменить, удалить, статус)
-- - - [x] waiting_for_ind
-- - - [x] waiting_for_btn_action
-- - - [x] waiting_for_btn_edit
-- - - [x] waiting_for_btn_delete
-- - - - [x] YES
-- - - - [x] No
-- - - [x] waiting_for_new_name
-- - - [x] waiting_for_new_path
-- - - [x] type
-- - [x] написание add_deck
-- - [x] написание my_decks
-- - - [x] написать выбрать
-- - - [x] написать удалить
-- - - [x] дописать сообщение об отсутствии колод
-- - [x] написать my_account
-- - [x] написать decks_shop
-- - [x] users
-- - [x] moderation
-- - [x] change_limit
-
-
-- [x] перенос текста в константы
-- - [x] add_deck
-- - [x] my_decks
-- - [x] new_deck
-- - [x] new_game
-- - [x] duration
-- - [x] help
-- - [x] start
-- - [x] decks_shop
-
-
-- [x] создание документации/комментариев
-- - [x] DB
-- - [x] DBApi
-- - [x] add_deck
-- - [x] my_decks
-- - [x] duration
-- - [x] decks_shop
-- - [x] new_game
-- - [x] new_deck
-
-
-- [ ] Создание Docker
-- [ ] Деплой на хостинг
+### Благодарность за помощь в разработке:
+ - https://github.com/SilverSheldon
+ - https://github.com/ShadowM4rsh
+ - https://github.com/Vera152022
