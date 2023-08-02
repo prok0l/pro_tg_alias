@@ -1,7 +1,4 @@
-import logging
-
 from aiogram import types, Dispatcher
-from aiogram.dispatcher.filters import Command
 
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import Start
