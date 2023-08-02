@@ -43,7 +43,6 @@ async def wait_for_ind(message: types.Message, state: FSMContext):
             (ind := int(message.text)) <= len(data["decks"]):
         await state.update_data(ind=ind - 1)
         now_deck = data["decks"][ind - 1]
-
         kbd = types.ReplyKeyboardMarkup(resize_keyboard=True)
         kbd.add(*ModerationButtons)
         await message.answer_document(caption=ModerationText.INFO.value.format(
@@ -95,7 +94,8 @@ def register_moderation(dp: Dispatcher, db: DBApi, admins: list):
                                 state=[
                                     ModerationSM.waiting_for_ind,
                                     ModerationSM.waiting_for_type
-                                ])
+                                ],
+                                commands=['cancel'])
     dp.register_message_handler(callback=wait_for_ind,
                                 state=ModerationSM.waiting_for_ind)
     dp.register_message_handler(callback=wait_for_btn,

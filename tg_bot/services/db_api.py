@@ -2,6 +2,8 @@ import sqlite3
 import os
 
 from tg_bot.services.consts import DeckTypes, DeckTypesList, LimitText
+from tg_bot.services.file_filter import file_filter
+from tg_bot.services.consts import Path
 
 
 class DBApi:
@@ -49,6 +51,7 @@ class DBApi:
                             `type` INTEGER NOT NULL,
                             `owner` INTEGER,
                             `path` TEXT,
+                            `num_words` INTEGER,
                             FOREIGN KEY (`owner`) REFERENCES `users`(`tg_id`),
                             FOREIGN KEY (`type`) REFERENCES `deck_type`(`id`)
                         );
@@ -73,24 +76,24 @@ class DBApi:
 
                          """)
             for par in DeckTypesList.Types.value:
-                self.connect(text_for_execute=
-                             """INSERT INTO deck_type(name, is_public)
-                            VALUES(?, ?)""",
+                self.connect(text_for_execute="""INSERT INTO
+                 deck_type(name, is_public) VALUES(?, ?)""",
                              params=par)
-            pub_type_id = self.connect(text_for_execute=
-                                       "SELECT id FROM deck_type WHERE name=?",
+            pub_type_id = self.connect(text_for_execute="SELECT id "
+                                                        "FROM deck_type "
+                                                        "WHERE name=?",
                                        params=(DeckTypes.PUBLIC.value,),
                                        fetchall=True)[0][0]
-            decks = [("Alias party", pub_type_id, "1.txt"),
+            decks = [("Alias party", pub_type_id, "1.txt", 1991),
                      ("Alias дамы против джентельменов (муж. версия)",
-                      pub_type_id, "2.txt"),
+                      pub_type_id, "2.txt", 1200),
                      ("Alias дамы против джентельменов (жен. версия)",
-                      pub_type_id, "3.txt")]
+                      pub_type_id, "3.txt", 1180)]
             for deck in decks:
                 self.connect(text_for_execute="""
-                            INSERT INTO decks(name, type, path)
+                            INSERT INTO decks(name, type, path, num_words)
                             VALUES(?, ?, ?)""",
-                                              params=deck)
+                             params=deck)
 
     def create_user(self, tg_id, username):
         """
@@ -101,15 +104,14 @@ class DBApi:
         """
         if self.connect(text_for_execute="""
         SELECT * FROM users WHERE tg_id=?;
-        """, params=(tg_id, ), fetchall=True):
+        """, params=(tg_id,), fetchall=True):
             return None
         self.connect(text_for_execute="""
         INSERT INTO users(tg_id, username) VALUES(?, ?)""",
-                     params=(tg_id, username, ))
+                     params=(tg_id, username,))
         decks = self.connect("""SELECT id FROM decks ORDER BY id LIMIT 1""",
                              fetchall=True)[0][0]
-        now_deck = self.connect(text_for_execute=
-                                """
+        now_deck = self.connect(text_for_execute="""
         INSERT INTO decks_users(id_user, id_deck) VALUES(?, ?) RETURNING id""",
                                 params=(tg_id, decks), fetchall=True)[0][0]
         self.connect(text_for_execute="""
@@ -122,14 +124,13 @@ class DBApi:
         :param tg_id:
         :return:
         """
-        dur, now_deck_path = self.connect(text_for_execute=
-                                          """
+        dur, now_deck_path = self.connect(text_for_execute="""
         SELECT duration, now_deck FROM settings_user WHERE id_user=?""",
-                                          params=(tg_id, ), fetchall=True)[0]
+                                          params=(tg_id,), fetchall=True)[0]
         if now_deck_path:
             now_deck_id = self.connect(text_for_execute="""
             SELECT id_deck FROM decks_users WHERE id=?""",
-                                       params=(now_deck_path, ),
+                                       params=(now_deck_path,),
                                        fetchall=True)[0]
             now_deck_path = self.connect("""SELECT path FROM decks
              WHERE id=?""", params=now_deck_id, fetchall=True)[0][0]
@@ -145,7 +146,7 @@ class DBApi:
         """
         self.connect(text_for_execute="""
         UPDATE settings_user SET duration=? WHERE id_user=?""",
-                     params=(new_duration, tg_id, ))
+                     params=(new_duration, tg_id,))
 
     def change_deck(self, tg_id, deck_link):
         """
@@ -170,16 +171,17 @@ class DBApi:
         """
         now_deck = self.connect(text_for_execute="""
         SELECT now_deck FROM settings_user WHERE id_user=?""",
-                                     params=(tg_id,), fetchall=True)[0][0]
+                                params=(tg_id,), fetchall=True)[0][0]
 
         decks_id = self.connect("""SELECT id, id_deck FROM decks_users
-         WHERE id_user=?""", params=(tg_id, ), fetchall=True)
+         WHERE id_user=?""", params=(tg_id,), fetchall=True)
         decks = []
         for deck_id in decks_id:
-            deck_name = self.connect("""SELECT name FROM decks WHERE id=?""",
-                                     params=(deck_id[1], ),
-                                     fetchall=True)[0][0]
-            decks.append((deck_id[0], deck_name))
+            deck_info = self.connect("""SELECT name, num_words
+             FROM decks WHERE id=?""",
+                                     params=(deck_id[1],),
+                                     fetchall=True)[0]
+            decks.append((deck_id[0], deck_info[0], deck_info[1]))
         return decks, now_deck
 
     def is_max_decks(self, tg_id):
@@ -188,9 +190,9 @@ class DBApi:
         :param tg_id:
         :return:
         """
-        limit = self.connect(text_for_execute=
-                             "SELECT `limit` FROM users WHERE tg_id=?;",
-                             params=(tg_id, ), fetchall=True)
+        limit = self.connect(text_for_execute="SELECT `limit` FROM"
+                                              " users WHERE tg_id=?;",
+                             params=(tg_id,), fetchall=True)
         if not limit:
             return True
         else:
@@ -198,29 +200,33 @@ class DBApi:
         if limit == -1:
             return False
         count = self.connect("SELECT COUNT (*) FROM decks WHERE owner=?;",
-                             params=(tg_id, ), fetchall=True)[0][0]
+                             params=(tg_id,), fetchall=True)[0][0]
         if count >= limit:
             return True
         return False
 
-    def new_deck(self, tg_id, name, path):
+    def new_deck(self, tg_id, name, path, num_words):
         """
         функция создания новой колоды
         :param tg_id:
         :param name:
         :param path:
+        :param num_words:
         :return:
         """
         if self.is_max_decks(tg_id=tg_id):
             return None
-        pub_type_id = self.connect(text_for_execute=
-                                   "SELECT id FROM deck_type WHERE name=?",
+        pub_type_id = self.connect(text_for_execute="SELECT id FROM"
+                                                    " deck_type WHERE name=?",
                                    params=(DeckTypes.PRIVATE.value,),
                                    fetchall=True)[0][0]
-        deck_id = self.connect(text_for_execute=
-                               "INSERT INTO decks(name, type, owner, path)"
-                               "VALUES(?, ?, ?, ?) RETURNING id;",
-                               params=(name, pub_type_id, tg_id, path, ),
+        deck_id = self.connect(text_for_execute="INSERT INTO decks("
+                                                "name, type, owner, path,"
+                                                " num_words) "
+                                                "VALUES(?, ?, ?, ?, ?)"
+                                                " RETURNING id;",
+                               params=(name, pub_type_id, tg_id, path,
+                                       num_words),
                                fetchall=True)[0][0]
         self.add_deck(tg_id=tg_id, deck_id=deck_id)
         return deck_id
@@ -233,16 +239,17 @@ class DBApi:
         :param deck_id:
         :return:
         """
-        if self.connect(text_for_execute=
-                        "SELECT * FROM decks_users WHERE id_user=? AND "
-                        "id_deck=?", params=(tg_id, deck_id, ),
+        if self.connect(text_for_execute="SELECT * FROM decks_users"
+                                         " WHERE id_user=? AND "
+                                         "id_deck=?",
+                        params=(tg_id, deck_id,),
                         fetchall=True):
             return None
 
-        link_id = self.connect(text_for_execute=
-                               "INSERT INTO decks_users(id_user, id_deck)"
-                               "VALUES(?, ?) RETURNING id;",
-                               params=(tg_id, deck_id, ), fetchall=True)[0][0]
+        link_id = self.connect(text_for_execute="INSERT INTO"
+                                                " decks_users(id_user, id_deck)"
+                                                " VALUES(?, ?) RETURNING id;",
+                               params=(tg_id, deck_id,), fetchall=True)[0][0]
         self.change_deck(tg_id=tg_id, deck_link=link_id)
         return link_id
 
@@ -252,9 +259,8 @@ class DBApi:
         :param deck_name:
         :return:
         """
-        if self.connect(text_for_execute=
-                        "SELECT * FROM decks WHERE name=?",
-                        params=(deck_name, ),
+        if self.connect(text_for_execute="SELECT * FROM decks WHERE name=?",
+                        params=(deck_name,),
                         fetchall=True):
             return False
         return True
@@ -265,9 +271,8 @@ class DBApi:
         :param deck_id:
         :return:
         """
-        if self.connect(text_for_execute=
-                        "SELECT * FROM decks WHERE id=?",
-                        params=(deck_id, ),
+        if self.connect(text_for_execute="SELECT * FROM decks WHERE id=?",
+                        params=(deck_id,),
                         fetchall=True):
             return True
         return False
@@ -276,20 +281,21 @@ class DBApi:
         """
         функция проверки колоды перед линковкой
         возвращает None, если колода уже была добавлена
-        возвращает название колоды
+        возвращает название колоды и количество слов
         :param tg_id:
         :param deck_id:
         :return:
         """
-        if self.connect(text_for_execute=
-                        "SELECT * FROM decks_users WHERE id_user=? AND "
-                        "id_deck=?", params=(tg_id, deck_id,),
+        if self.connect(text_for_execute="SELECT * FROM decks_users"
+                                         " WHERE id_user=? AND id_deck=?",
+                        params=(tg_id, deck_id,),
                         fetchall=True):
             return None
-        name = self.connect(text_for_execute="SELECT name FROM decks WHERE "
-                                             "id=?",
-                            params=(deck_id, ), fetchall=True)[0][0]
-        return name
+        name, num_words = self.connect(text_for_execute="SELECT name, num_words"
+                                                        " FROM"
+                                                        " decks WHERE id=?",
+                                       params=(deck_id,), fetchall=True)[0]
+        return name, num_words
 
     def del_deck_link(self, tg_id, deck_link):
         """
@@ -300,12 +306,12 @@ class DBApi:
         """
         if self.connect("SELECT * FROM settings_user WHERE id_user=? AND "
                         "now_deck=?",
-                        params=(tg_id, deck_link, ), fetchall=True):
+                        params=(tg_id, deck_link,), fetchall=True):
             self.connect(text_for_execute="""
             UPDATE settings_user SET now_deck=? WHERE id_user=?""",
                          params=(None, tg_id,))
         self.connect("DELETE FROM decks_users WHERE id=?",
-                     params=(deck_link, ))
+                     params=(deck_link,))
 
     def decks_shop(self, tg_id):
         """
@@ -316,15 +322,15 @@ class DBApi:
         """
         pub_id = self.connect("SELECT id FROM deck_type "
                               "WHERE is_public", fetchall=True)[0][0]
-        decks = self.connect("SELECT id, name FROM decks "
+        decks = self.connect("SELECT id, name, num_words FROM decks "
                              "WHERE type=?",
-                             params=(pub_id, ), fetchall=True)
+                             params=(pub_id,), fetchall=True)
         for i in range(len(decks)):
-            id, _ = decks[i]
+            deck_id, _, _ = decks[i]
             decks[i] += (bool(self.connect("SELECT * FROM decks_users "
                                            "WHERE id_user=? AND id_deck=?",
-                                           params=(tg_id, id),
-                                           fetchall=True)), )
+                                           params=(tg_id, deck_id),
+                                           fetchall=True)),)
         return decks
 
     def refactor_deck(self, deck_id):
@@ -338,7 +344,7 @@ class DBApi:
         pub_id = self.connect("SELECT id FROM deck_type WHERE is_public",
                               fetchall=True)[0][0]
         if self.connect("SELECT type FROM decks WHERE id=?",
-                        params=(deck_id, ), fetchall=True)[0][0] == pub_id:
+                        params=(deck_id,), fetchall=True)[0][0] == pub_id:
             mod_id = self.connect("SELECT id FROM deck_type WHERE name=?",
                                   params=(DeckTypes.MODERATION.value,),
                                   fetchall=True)[0][0]
@@ -356,19 +362,20 @@ class DBApi:
             return False
         self.refactor_deck(deck_id=deck_id)
         self.connect("UPDATE decks SET name=? WHERE id=?",
-                     params=(new_name, deck_id, ))
+                     params=(new_name, deck_id,))
         return True
 
-    def change_file_in_deck(self, deck_id, new_path):
+    def change_file_in_deck(self, deck_id, new_path, num_words):
         """
         функция смены загрузочного файла колоды
         :param deck_id:
         :param new_path:
+        :param num_words:
         :return:
         """
         self.refactor_deck(deck_id=deck_id)
-        self.connect("UPDATE decks SET path=? WHERE id=?",
-                     params=(new_path, deck_id,))
+        self.connect("UPDATE decks SET path=?, num_words=? WHERE id=?",
+                     params=(new_path, num_words, deck_id,))
 
     def change_type_deck(self, deck_id, new_type):
         """
@@ -378,10 +385,20 @@ class DBApi:
         :return:
         """
         type_id = self.connect("SELECT id FROM deck_type WHERE name=?",
-                               params=(new_type, ),
+                               params=(new_type,),
                                fetchall=True)[0][0]
         self.connect("UPDATE decks SET type=? WHERE id=?",
                      params=(type_id, deck_id))
+
+    def change_num_words(self, deck_id, new_num):
+        """
+        функция изменения количества слов в колоде
+        :param deck_id:
+        :param new_num:
+        :return:
+        """
+        self.connect("UPDATE `decks` SET `num_words`=? WHERE `id`=?",
+                     params=(new_num, deck_id,))
 
     def decks_by_owner(self, tg_id):
         """
@@ -389,15 +406,15 @@ class DBApi:
         :param tg_id:
         :return:
         """
-        decks_lst = self.connect("SELECT id, name, type FROM"
+        decks_lst = self.connect("SELECT id, name, type, `num_words` FROM"
                                  " decks WHERE owner=?",
-                                 params=(tg_id, ),
+                                 params=(tg_id,),
                                  fetchall=True)
         decks = []
         for deck in decks_lst:
-            type = self.connect("SELECT name FROM deck_type WHERE id=?",
-                                params=(deck[2], ), fetchall=True)[0][0]
-            decks.append([deck[0], deck[1], type])
+            type_deck = self.connect("SELECT name FROM deck_type WHERE id=?",
+                                     params=(deck[2],), fetchall=True)[0][0]
+            decks.append([deck[0], deck[1], type_deck, deck[3]])
         return decks
 
     def del_deck(self, deck_id):
@@ -408,13 +425,13 @@ class DBApi:
         """
         users = self.connect(text_for_execute="""
         SELECT id_user, id FROM decks_users WHERE id_deck=?""",
-                             params=(deck_id, ), fetchall=True)
+                             params=(deck_id,), fetchall=True)
         for user in users:
             self.del_deck_link(tg_id=user[0],
                                deck_link=user[1])
         self.connect(text_for_execute="""
         DELETE FROM decks WHERE id=?""",
-                     params=(deck_id, ))
+                     params=(deck_id,))
 
     def my_account(self, tg_id):
         """
@@ -425,8 +442,8 @@ class DBApi:
         dur, _ = self.user_info(tg_id=tg_id)
         deck_links = self.decks_by_tg_id(tg_id=tg_id)
         deck_owner = self.decks_by_owner(tg_id=tg_id)
-        limit = self.connect(text_for_execute=
-                             "SELECT `limit` FROM users WHERE tg_id=?;",
+        limit = self.connect(text_for_execute="SELECT `limit` FROM"
+                                              " users WHERE tg_id=?;",
                              params=(tg_id,), fetchall=True)
         if not limit:
             limit = 0
@@ -437,6 +454,20 @@ class DBApi:
         count = self.connect("SELECT COUNT (*) FROM decks WHERE owner=?;",
                              params=(tg_id,), fetchall=True)[0][0]
         return dur, deck_links, deck_owner, limit, count
+
+    def add_num_words_column(self):
+        """
+        системная функция необходимая, для создания поля количество слов
+        :return:
+        """
+        self.connect(text_for_execute="ALTER TABLE decks ADD"
+                                      " `num_words` INTEGER")
+        decks = self.connect("SELECT `id`, `path` FROM decks",
+                             fetchall=True)
+        for deck_id, deck_path in decks:
+            count_words = file_filter("../../" + Path.DECKS.value + deck_path)
+            self.connect("UPDATE `decks` SET `num_words`=? WHERE `id`=?",
+                         params=(count_words, deck_id, ))
 
     def users(self):
         """
@@ -472,20 +503,20 @@ class DBApi:
         mod_id = self.connect("SELECT id FROM deck_type WHERE name=?",
                               params=(DeckTypes.MODERATION.value, ),
                               fetchall=True)[0][0]
-        decks = self.connect("SELECT id, name, owner, path FROM decks "
+        decks = self.connect("SELECT id, name, owner, path, num_words"
+                             " FROM decks "
                              "WHERE type=?",
                              params=(mod_id, ), fetchall=True)
         decks_with_username = []
-        for (deck_id, name, tg_id, path) in decks:
+        for (deck_id, name, tg_id, path, num_words) in decks:
             username = self.connect("SELECT username FROM users WHERE tg_id=?",
                                     params=(tg_id, ), fetchall=True)[0][0]
-            decks_with_username.append([deck_id, name, username, path])
+            decks_with_username.append([deck_id, name, username,
+                                        path, num_words])
         return decks_with_username
 
 
 if __name__ == '__main__':
     obj = DBApi("../../systemd/1.db")
-    print(obj.moderation())
-
-
-
+    # obj.my_account(tg_id=700843021)
+    obj.add_num_words_column()

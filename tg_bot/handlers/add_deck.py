@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import AddDeckButtons, AddDeckText, CancelText
+from tg_bot.services.word import word_func
 
 db_obj: DBApi
 
@@ -25,7 +26,8 @@ async def add_deck_start(message: types.Message, state: FSMContext):
         await message.answer(AddDeckText.NO_ID.value)
         return None
 
-    name = db_obj.deck_info(tg_id=message.from_user.id, deck_id=deck_id)
+    name, num_words = db_obj.deck_info(tg_id=message.from_user.id,
+                                       deck_id=deck_id)
     # проверка на добавление раньше
     if not name:
         await message.answer(AddDeckText.ADDED_EARLIER.value)
@@ -34,7 +36,9 @@ async def add_deck_start(message: types.Message, state: FSMContext):
     kbd = types.ReplyKeyboardMarkup(resize_keyboard=True)
     kbd.add(*AddDeckButtons)
     # ожидание выбора пользователем Да/Нет
-    await message.answer(AddDeckText.CHECKING_QUESTION.value.format(name=name),
+    await message.answer(AddDeckText.CHECKING_QUESTION.value.
+                         format(name=name, num_words=num_words,
+                                word=word_func(num_words)),
                          reply_markup=kbd)
     await state.set_state(AddDeckSM.waiting_for_button.state)
     await state.update_data(deck_id=deck_id)

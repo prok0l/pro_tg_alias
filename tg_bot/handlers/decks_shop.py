@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import CancelText, DecksShopText
+from tg_bot.services.word import word_func
 
 db_obj: DBApi
 
@@ -17,13 +18,16 @@ async def decks_shop_start(message: types.Message, state: FSMContext):
     # формирование строки с перечнем колод и нумерацией
     decks_str_lst = []
     for ind in range(len(decks)):
+        num_words = decks[ind][2]
+        word = word_func(num_words)
         if not decks[ind][-1]:
             decks_str_lst.append(DecksShopText.DECK_NAME.value.format(
-                ind=ind+1,
-                name=decks[ind][1]))
+                ind=ind+1, name=decks[ind][1],
+                num_words=decks[ind][2], word=word))
         else:
             decks_str_lst.append(DecksShopText.DECK_NAME_AVAILABLE.value.
-                                 format(ind=ind+1, name=decks[ind][1]))
+                                 format(ind=ind+1, name=decks[ind][1],
+                                        num_words=num_words, word=word))
 
     await message.answer(
         "\n".join(decks_str_lst) + "\n" + DecksShopText.START.value
@@ -45,6 +49,7 @@ async def deck_chosen(message: types.Message, state: FSMContext):
             await message.answer(DecksShopText.ADDED_EARLIER.value)
         else:
             await message.answer(DecksShopText.ADD_DECK.value)
+        await state.finish()
 
     # обработка некоректного ind
     else:

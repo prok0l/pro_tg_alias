@@ -31,7 +31,8 @@ class AddDeckText(str, Enum):
                  "которую вы хотите добавить"
     NO_ID = "Простите, но колоды с таким id не существует"
     ADDED_EARLIER = "Эта колода уже была добавлена ранее"
-    CHECKING_QUESTION = "Вы действительно хотите добавить колоду - {name}"
+    CHECKING_QUESTION = "Вы действительно хотите добавить колоду - {name}\t" \
+                        "({num_words} {word})"
     INVALID_BTN = "Выберите действие кнопками ниже"
     ADDED = "Колода успешно добавлена"
 
@@ -49,8 +50,8 @@ class MyDecksText(str, Enum):
     CHOOSE_DECK = "Вы выбрали колоду - {name}"
     DEL_DECK = "Колода успешно удалена"
     NO_DECKS = "У вас нету колод"
-    DECK_NAME = "{ind}) {name}"
-    DECK_NAME_USED = "{ind}) <b>{name}</b>"
+    DECK_NAME = "{ind}) {name}\t({num_words} {word})"
+    DECK_NAME_USED = "{ind}) <b>{name}</b>\t({num_words} {word})"
 
 
 class NewDeckText(str, Enum):
@@ -106,8 +107,8 @@ class DecksShopText(str, Enum):
     INVALID_NUM = MyDecksText.INVALID_NUM.value
     ADD_DECK = AddDeckText.ADDED.value
     ADDED_EARLIER = AddDeckText.ADDED_EARLIER.value
-    DECK_NAME = "{ind}) {name}"
-    DECK_NAME_AVAILABLE = "{ind}) <s>{name}</s>"
+    DECK_NAME = "{ind}) {name}\t({num_words} {word})"
+    DECK_NAME_AVAILABLE = "{ind}) <s>{name} \t({num_words} {word})</s>"
 
 
 class ListDecksTypes(dict, Enum):
@@ -119,7 +120,7 @@ class ListDecksTypes(dict, Enum):
 
 
 class ListDecksText(str, Enum):
-    LIST = "{ind}) {name}\t{type_str}"
+    LIST = "{ind}) {name}\t({num_words} {word})\t{type_str}"
     YOUR_DECKS = "Колоды созданные вами:\n"
     INVALID_NUM = MyDecksText.INVALID_NUM.value
     START = MyDecksText.START.value
@@ -137,6 +138,7 @@ class ListDecksText(str, Enum):
     TYPE_PUBLIC = "Сделать приватной"
     TYPE_EDIT_PRIVATE = "Колода сделана приватной"
     DELETE = "Колода успешно удалена"
+    NEW_FILE_ADD = "Файл успешно изменен"
 
 
 class ListDecksButtons:
@@ -163,10 +165,10 @@ class LimitText(str, Enum):
 
 
 class MyAccountText(str, Enum):
-    LINK_DECKS1 = "{name}"
-    LINK_DECKS2 = "<b>{name}</b>"
-    OWNERS_DECKS = "{name}\t{type_str}"
-    STR = "Длительность раунда: {dur}\n" + \
+    LINK_DECKS1 = "{name}\t({num_words} {word})"
+    LINK_DECKS2 = "<b>{name}</b>\t({num_words} {word})"
+    OWNERS_DECKS = "{name}\t{type_str}\t({num_words} {word})"
+    STR = "Длительность раунда: {dur} сек.\n" + \
           "Мои колоды:\n" + \
           "{link_decks_str}\n" + \
           "Колоды созданные мной:\n" + \
@@ -209,7 +211,8 @@ class ModerationText(str, Enum):
     START_FULL = "{str}\n" + MyDecksText.START.value
     INVALID_NUM = MyDecksText.INVALID_NUM.value
     INFO = "name: {x[1]}\n" \
-           "owner: {x[2]}"
+           "owner: {x[2]}\n" \
+           "num_words: {x[4]}"
     INVALID_BTN = MyDecksText.INVALID_BTN.value
     END = "Тип колоды изменен на: {type}"
 

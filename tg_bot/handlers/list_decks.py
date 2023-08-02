@@ -7,7 +7,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import CancelText, ListDecksTypes, ListDecksText,\
     ListDecksButtons, DeckTypes, Path
-from tg_bot.services.file_filter import file_filter
+from tg_bot.services.file_filter import file_filter, word_filter
+from tg_bot.services.word import word_func
 
 db_obj: DBApi
 
@@ -28,11 +29,14 @@ async def list_decks_start(message: types.Message, state: FSMContext):
         await message.answer(ListDecksText.NO_DECKS.value)
         return None
     decks_str_lst = []
-    for ind, (_, name, type_name) in enumerate(decks):
+    for ind, (_, name, type_name, num_words) in enumerate(decks):
+        word = word_func(num_words)
         type_str = ListDecksTypes.TYPES[type_name]
         decks_str_lst.append(
             ListDecksText.LIST.value.format(ind=ind + 1, name=name,
-                                            type_str=type_str))
+                                            type_str=type_str,
+                                            num_words=num_words,
+                                            word=word))
 
     await message.answer(ListDecksText.YOUR_DECKS.value +
                          "\n".join(decks_str_lst) + "\n" +
@@ -91,12 +95,12 @@ async def edit_btn(message: types.Message, state: FSMContext):
         return None
     kbd = types.ReplyKeyboardRemove()
     if message.text == ListDecksButtons.Edit.NAME.value:
-        await state.set_state(ListDecksSM.waiting_for_new_name.state)
         await message.answer(ListDecksText.NEW_NAME.value, reply_markup=kbd)
+        await state.set_state(ListDecksSM.waiting_for_new_name.state)
 
     elif message.text == ListDecksButtons.Edit.FILE.value:
-        await state.set_state(ListDecksSM.waiting_for_new_path.state)
         await message.answer(ListDecksText.NEW_FILE.value, reply_markup=kbd)
+        await state.set_state(ListDecksSM.waiting_for_new_path.state)
 
 
 async def del_btn(message: types.Message, state: FSMContext):
@@ -117,8 +121,9 @@ async def del_btn(message: types.Message, state: FSMContext):
 async def new_name(message: types.Message, state: FSMContext):
     data = await state.get_data()
     deck = data["decks"][data["ind"]][0]
+    name = word_filter(message.text)
     is_new_name = db_obj.rename_deck(deck_id=deck,
-                                     new_name=message.text)
+                                     new_name=name)
     if not is_new_name:
         await message.answer(ListDecksText.BUZY.value)
     else:
@@ -134,9 +139,12 @@ async def new_path(message: types.Message, state: FSMContext):
                                                             '.')) + 1) + ".txt"
     await message.bot.download_file(file_path=file.file_path,
                                     destination=Path.DECKS.value + path)
-    file_filter(Path.DECKS.value + path)
+    num_words = file_filter(Path.DECKS.value + path)
     db_obj.change_file_in_deck(deck_id=deck,
-                               new_path=path)
+                               new_path=path,
+                               num_words=num_words)
+    await message.answer(ListDecksText.NEW_FILE_ADD.value)
+    await state.finish()
 
 
 async def type_order(message: types.Message, state: FSMContext):

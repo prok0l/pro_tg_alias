@@ -53,7 +53,26 @@
 - - [x] decks_shop
 - - [x] new_game
 - - [x] new_deck
+- - [ ] list_decks
+- - [ ] help
+- - [ ] start
+- - [ ] moderation
+- - [ ] change_limit
+- - [ ] users
 
 
 - [x] Создание Docker
 - [x] Деплой на хостинг
+
+
+- [x] написать num_words
+- - [x] добавить колонку в бд
+- - [x] написать счётчик
+- - [x] поправить хендлеры
+- - - [x] add_deck
+- - - [x] decks_shop
+- - - [x] new_deck
+- - - [x] list_decks
+- - - [x] moderation
+- - - [x] my_account
+- - - [x] my_decks

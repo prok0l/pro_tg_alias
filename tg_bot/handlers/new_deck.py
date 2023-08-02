@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.consts import Path, DeckTypes, NewDeckText, CancelText
-from tg_bot.services.file_filter import file_filter
+from tg_bot.services.file_filter import file_filter, word_filter
 
 db_obj: DBApi
 
@@ -27,12 +27,13 @@ async def new_deck_start(message: types.Message, state: FSMContext):
 
 
 async def name_chosen(message: types.Message, state: FSMContext):
+    name = word_filter(message.text)
     # проверка уникальности названия
-    if not db_obj.check_deck_name(deck_name=message.text):
+    if not db_obj.check_deck_name(deck_name=name):
         await message.answer(NewDeckText.BUZY.value)
         return None
 
-    await state.update_data(name=message.text)
+    await state.update_data(name=name)
     await state.set_state(OrderDeck.waiting_for_file.state)
     await message.answer(NewDeckText.TXT.value)
 
@@ -46,11 +47,12 @@ async def file_chosen(message: types.Message, state: FSMContext):
     await message.bot.download_file(file_path=file.file_path,
                                     destination=Path.DECKS.value + path)
 
-    file_filter(Path.DECKS.value + path)
+    num_words = file_filter(Path.DECKS.value + path)
     data = await state.get_data()
 
     deck_id = db_obj.new_deck(tg_id=message.from_user.id,
-                              name=data["name"], path=path)
+                              name=data["name"], path=path,
+                              num_words=num_words)
     await message.answer(NewDeckText.ADDED.value
                          .format(name=data['name'],
                                  type=DeckTypes.PRIVATE.value,
