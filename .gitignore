@@ -1,4 +1,9 @@
 venv/*
 __pycache__/
 .env
-decks/*
+systemd/1.db
+.idea/*
+systemd/decks/*
+!systemd/decks/1.txt
+!systemd/decks/2.txt
+!systemd/decks/3.txt
