@@ -165,9 +165,9 @@ class LimitText(str, Enum):
 
 
 class MyAccountText(str, Enum):
-    LINK_DECKS1 = "{name}\t({num_words} {word})"
-    LINK_DECKS2 = "<b>{name}</b>\t({num_words} {word})"
-    OWNERS_DECKS = "{name}\t{type_str}\t({num_words} {word})"
+    LINK_DECKS1 = "{name}"
+    LINK_DECKS2 = "<b>{name}</b>"
+    OWNERS_DECKS = "{name}\t{type_str}"
     STR = "Длительность раунда: {dur} сек.\n" + \
           "Мои колоды:\n" + \
           "{link_decks_str}\n" + \

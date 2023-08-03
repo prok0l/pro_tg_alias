@@ -518,5 +518,4 @@ class DBApi:
 
 if __name__ == '__main__':
     obj = DBApi("../../systemd/1.db")
-    # obj.my_account(tg_id=700843021)
     obj.add_num_words_column()
