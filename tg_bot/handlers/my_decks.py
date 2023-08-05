@@ -98,7 +98,7 @@ def register_my_decks(dp: Dispatcher, db: DBApi):
     global db_obj
     db_obj = db
     dp.register_message_handler(callback=my_decks_start, commands=["my_decks"],
-                                state="*")
+                                state=None)
     dp.register_message_handler(callback=cmd_cancel, commands=["cancel"],
                                 state=[OrderDeck.waiting_for_deck,
                                        OrderDeck.waiting_for_btn])

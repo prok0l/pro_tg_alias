@@ -53,7 +53,7 @@ def register_change_limit(dp: Dispatcher, db: DBApi, admins: list):
     ADMINS = admins
     dp.register_message_handler(callback=change_limit,
                                 commands=['change_limit'],
-                                content_types="text", state="*")
+                                content_types="text", state=None)
     dp.register_message_handler(callback=cmd_cancel,
                                 state=ChangeLimitSM.waiting_for_limit,
                                 commands=['cancel'])

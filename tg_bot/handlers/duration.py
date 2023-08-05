@@ -40,7 +40,7 @@ def register_duration(dp: Dispatcher, db: DBApi):
     global db_obj
     db_obj = db
     dp.register_message_handler(callback=duration_start, commands=["duration"],
-                                state="*")
+                                state=None)
     dp.register_message_handler(callback=cmd_cancel, commands=["cancel"],
                                 state=OrderDuration.waiting_for_duration)
     dp.register_message_handler(callback=duration_chosen,

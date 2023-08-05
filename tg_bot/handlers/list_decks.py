@@ -186,7 +186,7 @@ def register_list_decks(dp: Dispatcher, db: DBApi):
     db_obj = db
     dp.register_message_handler(callback=list_decks_start,
                                 commands=["list_decks"],
-                                state="*")
+                                state=None)
     dp.register_message_handler(callback=cmd_cancel, commands=["cancel"],
                                 state=[
                                     ListDecksSM.waiting_for_ind,

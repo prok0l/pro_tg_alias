@@ -68,7 +68,7 @@ def register_decks_shop(dp: Dispatcher, db: DBApi):
     db_obj = db
     dp.register_message_handler(callback=decks_shop_start,
                                 commands=["decks_shop"],
-                                state="*")
+                                state=None)
     dp.register_message_handler(callback=cmd_cancel, commands=["cancel"],
                                 state=DecksShopSM.waiting_for_deck)
     dp.register_message_handler(callback=deck_chosen,

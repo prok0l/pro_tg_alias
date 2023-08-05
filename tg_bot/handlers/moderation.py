@@ -89,7 +89,7 @@ def register_moderation(dp: Dispatcher, db: DBApi, admins: list):
     dp.register_message_handler(callback=moderation,
                                 commands=['moderation'],
                                 content_types="text",
-                                state="*")
+                                state=None)
     dp.register_message_handler(callback=cmd_cancel,
                                 state=[
                                     ModerationSM.waiting_for_ind,

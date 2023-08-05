@@ -71,7 +71,7 @@ def register_new_deck(dp: Dispatcher, db: DBApi):
     global db_obj
     db_obj = db
     dp.register_message_handler(callback=new_deck_start, commands=["new_deck"],
-                                state="*")
+                                state=None)
     dp.register_message_handler(callback=cmd_cancel, commands=["cancel"],
                                 state=[OrderDeck.waiting_for_file,
                                        OrderDeck.waiting_for_name])

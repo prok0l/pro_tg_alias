@@ -67,6 +67,6 @@ def register_add_deck(dp: Dispatcher, db: DBApi):
     global db_obj
     db_obj = db
     dp.register_message_handler(callback=add_deck_start, commands=['add_deck'],
-                                content_types="text", state="*")
+                                content_types="text", state=None)
     dp.register_message_handler(callback=btn,
                                 state=AddDeckSM.waiting_for_button)
