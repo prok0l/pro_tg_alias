@@ -23,21 +23,21 @@
     ```
 ---
 #### Список команд:  
-[/start](https://t.me/alias_tgbot) - старт бота  
-[/help](https://t.me/alias_tgbot) - список команд  
-[/new_game](https://t.me/alias_tgbot) - запустить игру  
-[/stop_game](https://t.me/alias_tgbot) - остановить игру  
-[/add_deck](https://t.me/alias_tgbot) - добавить колоду через id  
-[/duration](https://t.me/alias_tgbot) - длительность раунда  
-[/my_decks](https://t.me/alias_tgbot) - список колод  
-[/new_deck](https://t.me/alias_tgbot) - создать свою колоду  
-[/decks_shop](https://t.me/alias_tgbot) - магазин колод  
-[/list_decks](https://t.me/alias_tgbot) - колоды созданные мной  
-[/my_account](https://t.me/alias_tgbot) - информация об аккаунте  
-[/cancel](https://t.me/alias_tgbot) - отменить операцию  
-[/users](https://t.me/alias_tgbot) - список пользователей  
-[/change_limit](https://t.me/alias_tgbot) - смена лимита пользователя по его id  
-[/moderation](https://t.me/alias_tgbot) - модерация колод
+- [/start](https://t.me/alias_tgbot) - старт бота  
+- [/help](https://t.me/alias_tgbot) - список команд  
+- [/new_game](https://t.me/alias_tgbot) - запустить игру  
+- [/stop_game](https://t.me/alias_tgbot) - остановить игру  
+- [/add_deck](https://t.me/alias_tgbot) - добавить колоду через id  
+- [/duration](https://t.me/alias_tgbot) - длительность раунда  
+- [/my_decks](https://t.me/alias_tgbot) - список колод  
+- [/new_deck](https://t.me/alias_tgbot) - создать свою колоду  
+- [/decks_shop](https://t.me/alias_tgbot) - магазин колод  
+- [/list_decks](https://t.me/alias_tgbot) - колоды созданные мной  
+- [/my_account](https://t.me/alias_tgbot) - информация об аккаунте  
+- [/cancel](https://t.me/alias_tgbot) - отменить операцию  
+- [/users](https://t.me/alias_tgbot) - список пользователей  
+- [/change_limit](https://t.me/alias_tgbot) - смена лимита пользователя по его id  
+- [/moderation](https://t.me/alias_tgbot) - модерация колод
 ---
 ### License
 
