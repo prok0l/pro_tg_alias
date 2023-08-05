@@ -37,8 +37,8 @@
 [/my_account](https://t.me/alias_tgbot) - информация об аккаунте  
 [/cancel](https://t.me/alias_tgbot) - отменить операцию  
 [/users](https://t.me/alias_tgbot) - список пользователей  
-[/change_limit](https://t.me/alias_tgbot) - смена лимита пользователя по его id
-[/moderation](https://t.me/alias_tgbot) - модерация колод
+[/change_limit](https://t.me/alias_tgbot) - смена лимита пользователя по его id  
+[/moderation](https://t.me/alias_tgbot) - модерация колод  
 ---
 ### License
 
