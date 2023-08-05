@@ -1,5 +1,4 @@
 # Telegram bot для игры в Alias, с возможностью создания собственной колоды
-<a href="https://github.com/prok0l/pro_tg_alias/releases" title="Best-of Updates"><img src="https://img.shields.io/github/release-date/ml-tooling/best-of-python-dev?color=green&label=updated"></a>
 
 ### [BOT_URL](https://t.me/alias_tgbot)
 
@@ -38,7 +37,7 @@
 [/cancel](https://t.me/alias_tgbot) - отменить операцию  
 [/users](https://t.me/alias_tgbot) - список пользователей  
 [/change_limit](https://t.me/alias_tgbot) - смена лимита пользователя по его id  
-[/moderation](https://t.me/alias_tgbot) - модерация колод  
+[/moderation](https://t.me/alias_tgbot) - модерация колод
 ---
 ### License
 
