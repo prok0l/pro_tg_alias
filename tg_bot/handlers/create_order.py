@@ -3,6 +3,7 @@ from aiogram.types import PreCheckoutQuery
 
 from tg_bot.services.db_api import DBApi
 from tg_bot.services.data.items import One_limit
+from tg_bot.services.consts import Order
 
 db_obj: DBApi
 
@@ -14,7 +15,7 @@ async def show_invoices(message: types.Message):
 
 
 async def successful_payment(message: types.Message):
-    await message.answer("Спасибо за покупку!")
+    await message.answer(Order.SUCCESSFUL.value)
     db_obj.plus_one_limit(tg_id=message.from_user.id)
 
 

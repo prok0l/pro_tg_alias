@@ -220,3 +220,7 @@ class ModerationText(str, Enum):
 class ModerationButtons(str, Enum):
     APPROVE = "Одобрить"
     BAN = "Запретить"
+
+
+class Order(str, Enum):
+    SUCCESSFUL = "Спасибо за покупку!"
