@@ -93,6 +93,7 @@ class Help(str, Enum):
     DECKS_SHOP = "/decks_shop - магазин колод\n"
     LIST_DECKS = "/list_decks - колоды созданные мной\n"
     MY_ACCOUNT = "/my_account - информация об аккаунте\n"
+    PAY = "/pay - увеличить лимит количества колод\n"
     CANCEL = "/cancel - отменить операцию\n"
 
 

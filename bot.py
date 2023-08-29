@@ -19,7 +19,7 @@ from tg_bot.handlers.my_account import register_my_account
 from tg_bot.handlers.change_limit import register_change_limit
 from tg_bot.handlers.users import register_users
 from tg_bot.handlers.moderation import register_moderation
-from tg_bot.handlers.create_order import registrer_invoice
+from tg_bot.handlers.create_order import register_invoice
 from tg_bot.handlers.error import register_error
 from tg_bot.services.db_api import DBApi
 from tg_bot.config import TgBot
@@ -51,7 +51,7 @@ def register_all_handlers(dp: Dispatcher, db: DBApi, admins: list):
     register_users(dp=dp, db=db, admins=admins)
     register_change_limit(dp=dp, db=db, admins=admins)
     register_moderation(dp=dp, db=db, admins=admins)
-    registrer_invoice(dp=dp, db=db)
+    register_invoice(dp=dp, db=db)
     register_error(dp)
 
 

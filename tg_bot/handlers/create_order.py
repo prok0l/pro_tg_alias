@@ -19,7 +19,7 @@ async def successful_payment(message: types.Message):
     db_obj.plus_one_limit(tg_id=message.from_user.id)
 
 
-def registrer_invoice(dp: Dispatcher, db: DBApi):
+def register_invoice(dp: Dispatcher, db: DBApi):
     global db_obj
     db_obj = db
     dp.register_message_handler(callback=show_invoices, commands=['pay'])

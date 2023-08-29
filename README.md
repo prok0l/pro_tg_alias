@@ -39,6 +39,7 @@
 - [/users](https://t.me/alias_tgbot) - список пользователей  
 - [/change_limit](https://t.me/alias_tgbot) - смена лимита пользователя по его id  
 - [/moderation](https://t.me/alias_tgbot) - модерация колод
+- [/pay](https://t.me/alias_tgbot) - увеличить лимит количества колод
 ---
 ### License
 
