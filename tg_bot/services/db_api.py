@@ -246,8 +246,8 @@ class DBApi:
                         fetchall=True):
             return None
 
-        link_id = self.connect(text_for_execute="INSERT INTO"
-                                                " decks_users(id_user, id_deck)"
+        link_id = self.connect(text_for_execute="INSERT INTO "
+                                                "decks_users(id_user, id_deck)"
                                                 " VALUES(?, ?) RETURNING id;",
                                params=(tg_id, deck_id,), fetchall=True)[0][0]
         self.change_deck(tg_id=tg_id, deck_link=link_id)
@@ -291,7 +291,8 @@ class DBApi:
                         params=(tg_id, deck_id,),
                         fetchall=True):
             return None
-        name, num_words = self.connect(text_for_execute="SELECT name, num_words"
+        name, num_words = self.connect(text_for_execute="SELECT name,"
+                                                        " num_words"
                                                         " FROM"
                                                         " decks WHERE id=?",
                                        params=(deck_id,), fetchall=True)[0]
@@ -514,6 +515,14 @@ class DBApi:
             decks_with_username.append([deck_id, name, username,
                                         path, num_words])
         return decks_with_username
+
+    def plus_one_limit(self, tg_id: int):
+        limit = self.connect(text_for_execute="SELECT `limit` FROM"
+                                              " users WHERE tg_id=?",
+                             params=(tg_id, ), fetchall=True)[0][0]
+        if limit == -1:
+            return None
+        self.change_limit(tg_id=tg_id, new_limit=limit+1)
 
 
 if __name__ == '__main__':

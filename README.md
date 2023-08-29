@@ -13,9 +13,10 @@
 ### Cтарт проекта:
 - создание .env файла
     ```dotenv
-    BOT_TOKEN=
-    ADMINS=
+    BOT_TOKEN=...
+    ADMINS=...,
     USE_REDIS=False
+    PROVIDER_TOKEN=...
    ```
 - запуск контейнера
     ```shell
